@@ -41,24 +41,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
-      if (!session) {
-        // If no session, just redirect to login
-        navigate("/login");
-        return;
+      // Clear local state first
+      setUser(null);
+      setSession(null);
+
+      // Attempt to sign out from Supabase
+      const { error } = await supabase.auth.signOut({
+        scope: 'local' // Change to local scope to avoid 403 errors
+      });
+      
+      if (error) {
+        console.error("Sign out error:", error);
+        // Don't throw the error, just log it
       }
-      
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
+
+      // Always navigate to login, regardless of error
       toast.success("Successfully signed out!");
-      navigate("/login");
+      navigate("/login", { replace: true });
     } catch (error: any) {
       console.error("Sign out error:", error);
-      toast.error(error.message || "Failed to sign out. Please try again.");
-      // If we get a 403 or user_not_found error, force redirect to login
-      if (error.status === 403 || error.message.includes("user_not_found")) {
-        navigate("/login");
-      }
+      // Still navigate to login even if there's an error
+      navigate("/login", { replace: true });
+      toast.error("There was an issue signing out, but you've been redirected to login.");
     }
   };
 
