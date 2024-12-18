@@ -72,8 +72,8 @@ export const StatsPanel = () => {
   };
 
   return (
-    <Card className="w-full h-full flex flex-col animate-fadeIn">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 flex-shrink-0">
+    <Card className="w-full h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl font-semibold">Calendar</CardTitle>
         <Button 
           variant="outline" 
@@ -83,8 +83,8 @@ export const StatsPanel = () => {
           Today
         </Button>
       </CardHeader>
-      <CardContent className="flex-grow">
-        <div className="h-full flex flex-col">
+      <CardContent>
+        <div className="[&_.rdp]:w-full [&_.rdp-table]:w-full [&_.rdp-caption]:w-full [&_.rdp-cell]:w-[14.28%] [&_.rdp-head_th]:w-[14.28%]">
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -93,7 +93,7 @@ export const StatsPanel = () => {
             onMonthChange={setCurrentMonth}
             modifiers={modifiers}
             modifiersStyles={modifiersStyles}
-            className="rounded-md border flex-grow w-full"
+            className="rounded-md border"
             components={{
               DayContent: ({ date }) => {
                 const dayTasks = getDayTasks(date);
