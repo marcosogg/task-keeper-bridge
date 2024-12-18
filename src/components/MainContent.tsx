@@ -9,14 +9,15 @@ export const MainContent = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Welcome Banner */}
         <div className="bg-white rounded-xl p-6 shadow-sm animate-fadeIn" role="banner">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Welcome back, Sarah!</h1>
               <p className="text-gray-600 mt-1" role="status">Here's what's happening with your family today.</p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex flex-wrap gap-3">
               <Button 
-                className="bg-primary hover:bg-primary-dark"
+                size="default"
+                className="bg-primary hover:bg-primary-dark text-white transition-colors"
                 aria-label="Add new task"
               >
                 <ListPlus className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -24,7 +25,8 @@ export const MainContent = () => {
               </Button>
               <Button 
                 variant="outline" 
-                className="border-primary text-primary hover:bg-primary/10"
+                size="default"
+                className="border-primary text-primary hover:bg-primary/10 transition-colors"
                 aria-label="Create new event"
               >
                 <CalendarPlus className="mr-2 h-4 w-4" aria-hidden="true" />
