@@ -5,9 +5,9 @@ import { Footer } from "@/components/Footer";
 
 const Family = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <div className="flex">
+      <div className="flex flex-1">
         <Sidebar />
         <FamilyContent />
       </div>
