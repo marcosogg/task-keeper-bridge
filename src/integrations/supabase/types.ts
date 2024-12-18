@@ -302,7 +302,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_family_activity: {
+        Args: {
+          family_id_param: string
+          limit_param?: number
+        }
+        Returns: {
+          activity_type: string
+          activity_date: string
+          profile_id: string
+          description: string
+          related_id: string
+        }[]
+      }
+      get_family_member_stats: {
+        Args: {
+          family_id_param: string
+        }
+        Returns: {
+          profile_id: string
+          total_tasks: number
+          completed_tasks: number
+          overdue_tasks: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
