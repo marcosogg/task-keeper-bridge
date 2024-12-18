@@ -1,59 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
-
-interface Task {
-  id: string;
-  title: string;
-  date: string;  // Changed from Date to string for consistent data handling
-  priority: 'high' | 'medium' | 'low';
-}
-
-// Mock data with ISO string dates for consistency
-const mockTasks: Task[] = [
-  { 
-    id: '1', 
-    title: 'Family Dinner', 
-    date: new Date().toISOString(), 
-    priority: 'high' 
-  },
-  { 
-    id: '2', 
-    title: 'Soccer Practice', 
-    date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-    priority: 'medium' 
-  },
-  { 
-    id: '3', 
-    title: 'Grocery Shopping', 
-    date: new Date().toISOString(), 
-    priority: 'low' 
-  },
-];
-
-const fetchTasks = async () => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return mockTasks;
-};
-
-const getPriorityColor = (priority: Task['priority']) => {
-  switch (priority) {
-    case 'high':
-      return 'bg-red-500';
-    case 'medium':
-      return 'bg-yellow-500';
-    case 'low':
-      return 'bg-blue-500';
-    default:
-      return '';
-  }
-};
+import { TaskDialog } from "./calendar/TaskDialog";
+import { fetchTasks } from "@/utils/mockData";
+import { getPriorityColor } from "@/utils/styles";
+import type { Task } from "@/types/task";
 
 export const StatsPanel = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -66,9 +22,10 @@ export const StatsPanel = () => {
   });
 
   const getDayTasks = (date: Date) => {
-    return tasks?.filter(task => 
-      format(new Date(task.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-    ) || [];
+    if (!tasks) return [];
+    return tasks.filter(task => 
+      format(parseISO(task.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+    );
   };
 
   const handleDayClick = (date: Date) => {
@@ -85,6 +42,19 @@ export const StatsPanel = () => {
     hasTask: { border: '2px solid transparent' },
     today: { border: '2px solid var(--primary)' },
   };
+
+  if (isLoading) {
+    return (
+      <Card className="w-full h-full animate-pulse">
+        <CardHeader>
+          <CardTitle>Calendar</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px] bg-gray-100 rounded-lg" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full h-full">
@@ -123,7 +93,7 @@ export const StatsPanel = () => {
                         <span>{format(date, 'd')}</span>
                         {dayTasks.length > 0 && (
                           <div className="flex gap-1 mt-1">
-                            {dayTasks.slice(0, 3).map((task, index) => (
+                            {dayTasks.slice(0, 3).map((task) => (
                               <div
                                 key={task.id}
                                 className={cn(
@@ -167,36 +137,12 @@ export const StatsPanel = () => {
           />
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                Tasks for {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : ''}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {selectedDate && getDayTasks(selectedDate).map(task => (
-                <div 
-                  key={task.id}
-                  className="flex items-center gap-3 p-3 rounded-lg border"
-                >
-                  <div 
-                    className={cn(
-                      "w-3 h-3 rounded-full",
-                      getPriorityColor(task.priority)
-                    )}
-                  />
-                  <span>{task.title}</span>
-                </div>
-              ))}
-              {selectedDate && getDayTasks(selectedDate).length === 0 && (
-                <p className="text-muted-foreground text-center py-4">
-                  No tasks scheduled for this day
-                </p>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
+        <TaskDialog 
+          isOpen={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          selectedDate={selectedDate}
+          tasks={selectedDate ? getDayTasks(selectedDate) : []}
+        />
       </CardContent>
     </Card>
   );
