@@ -8,6 +8,7 @@ import Tasks from "./pages/Tasks";
 import Messages from "./pages/Messages";
 import Calendar from "./pages/Calendar";
 import Family from "./pages/Family";
+import Landing from "./pages/auth/Landing";
 import HelpCenter from "./pages/support/HelpCenter";
 import ContactSupport from "./pages/support/ContactSupport";
 import TermsOfService from "./pages/support/TermsOfService";
@@ -22,7 +23,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/dashboard" element={<Index />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/calendar" element={<Calendar />} />
