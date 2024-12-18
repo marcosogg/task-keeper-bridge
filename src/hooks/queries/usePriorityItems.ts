@@ -36,7 +36,7 @@ export const usePriorityItems = () => {
           priority,
           due_date,
           assigned_to,
-          profiles:assigned_to (
+          profiles!tasks_assigned_to_fkey (
             full_name,
             email
           )
