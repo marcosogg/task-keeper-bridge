@@ -8,13 +8,17 @@ import { useFamilyStats } from "@/hooks/queries/useFamilyStats";
 import { FamilyMemberAvatar } from "./family/FamilyMemberAvatar";
 import { FamilyMemberTooltip } from "./family/FamilyMemberTooltip";
 import { FamilyStatistics } from "./family/FamilyStatistics";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const FamilyOverview = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { data: familyMembers, isLoading } = useQuery({
     queryKey: ['familyMembers'],
     queryFn: async () => {
+      if (!user) return null;
+      
       const { data, error } = await supabase
         .from('family_members')
         .select(`
@@ -29,11 +33,13 @@ export const FamilyOverview = () => {
             id
           )
         `)
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .eq('profile_id', user.id);
 
       if (error) throw error;
       return data;
     },
+    enabled: !!user
   });
 
   const familyId = familyMembers?.[0]?.families?.id;

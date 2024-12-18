@@ -44,6 +44,20 @@ export const TaskCreationForm = ({ onCancel, onSuccess }: TaskCreationFormProps)
 
     setIsSubmitting(true);
     try {
+      // First get the user's family_id using maybeSingle()
+      const { data: familyMember, error: familyError } = await supabase
+        .from('family_members')
+        .select('family_id')
+        .eq('profile_id', user.id)
+        .maybeSingle();
+
+      if (familyError) throw familyError;
+      
+      if (!familyMember) {
+        toast.error("You need to be part of a family to create tasks");
+        return;
+      }
+
       const { error } = await supabase.from('tasks').insert({
         title: data.title,
         description: data.description,
@@ -51,14 +65,7 @@ export const TaskCreationForm = ({ onCancel, onSuccess }: TaskCreationFormProps)
         status: data.status,
         due_date: date?.toISOString(),
         created_by: user.id,
-        // Note: In a real app, you'd get the family_id from context or props
-        // For now, we'll query for the user's family
-        family_id: (await supabase
-          .from('family_members')
-          .select('family_id')
-          .eq('profile_id', user.id)
-          .single()
-        ).data?.family_id
+        family_id: familyMember.family_id
       });
 
       if (error) throw error;
