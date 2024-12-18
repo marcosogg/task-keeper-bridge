@@ -2,9 +2,19 @@ import { Clock, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTasks } from "@/hooks/queries/useTasks";
+import { toast } from "sonner";
 
 export const TaskList = () => {
-  const { data: tasks, isLoading } = useTasks();
+  const { data: tasks, isLoading, error } = useTasks();
+
+  if (error) {
+    toast.error("Failed to load tasks");
+    return (
+      <div className="p-4 bg-destructive/10 text-destructive rounded-lg">
+        <p>There was an error loading the tasks. Please try again later.</p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -31,9 +41,17 @@ export const TaskList = () => {
     );
   }
 
+  if (!tasks?.length) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">No tasks found. Create your first task to get started!</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4" role="list">
-      {tasks?.map((task) => (
+      {tasks.map((task) => (
         <div
           key={task.id}
           className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
@@ -50,7 +68,7 @@ export const TaskList = () => {
             <div>
               <p className="font-medium text-gray-900">{task.title}</p>
               <div className="flex items-center space-x-2 text-sm text-gray-500">
-                <span>Due: {new Date(task.dueDate || '').toLocaleDateString()}</span>
+                <span>Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}</span>
                 <span>•</span>
                 <span>Assigned to: {task.assignedTo?.join(', ') || 'Unassigned'}</span>
               </div>

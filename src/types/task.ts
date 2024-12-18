@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   title: string;
   description?: string;
-  status: 'todo' | 'in_progress' | 'completed' | 'cancelled';
+  status: 'todo' | 'in_progress' | 'completed';
   priority: 'low' | 'medium' | 'high';
   dueDate?: string;
   assignedTo?: string[];
@@ -11,7 +11,10 @@ export interface Task {
   createdAt: string;
   updatedAt: string;
   completedAt?: string;
-  tags?: string[];
+  assigned_to?: {
+    full_name: string | null;
+    email: string | null;
+  };
 }
 
 export interface TaskComment {

@@ -1,16 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchTasks } from "@/utils/mockData";
+import { supabase } from "@/integrations/supabase/client";
 import type { Task } from "@/types/task";
 
 export const useTasks = () => {
   return useQuery({
     queryKey: ['tasks'],
-    queryFn: fetchTasks,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    select: (data: Task[]) => {
-      return data.sort((a, b) => 
-        new Date(a.dueDate || '').getTime() - new Date(b.dueDate || '').getTime()
-      );
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          assigned_to:profiles!tasks_assigned_to_fkey (
+            full_name,
+            email
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching tasks:', error);
+        throw error;
+      }
+
+      return data.map(task => ({
+        ...task,
+        assignedTo: task.assigned_to ? [task.assigned_to.full_name || task.assigned_to.email] : [],
+      })) as Task[];
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
