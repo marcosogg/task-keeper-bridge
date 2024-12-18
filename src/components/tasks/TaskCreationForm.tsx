@@ -11,6 +11,7 @@ import { TaskFormActions } from "./form/TaskFormActions";
 import { TaskFormButtons } from "./form/TaskFormButtons";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import type { z } from "zod";
 
 type TaskFormValues = z.infer<typeof taskSchema>;
@@ -25,6 +26,7 @@ export const TaskCreationForm = ({ onCancel, onSuccess }: TaskCreationFormProps)
   const [priority, setPriority] = useState("medium");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
@@ -51,10 +53,13 @@ export const TaskCreationForm = ({ onCancel, onSuccess }: TaskCreationFormProps)
         .eq('profile_id', user.id)
         .maybeSingle();
 
-      if (familyError) throw familyError;
+      if (familyError) {
+        throw familyError;
+      }
       
       if (!familyMember) {
         toast.error("You need to be part of a family to create tasks");
+        navigate('/family');
         return;
       }
 
