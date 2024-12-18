@@ -2,58 +2,10 @@ import { AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-
-interface PriorityItem {
-  id: string;
-  title: string;
-  type: "task" | "event";
-  dueDate: string;
-  priority: "high" | "medium" | "low";
-  status: "pending" | "overdue";
-  assignedTo: string;
-}
-
-const mockPriorityItems: PriorityItem[] = [
-  {
-    id: "1",
-    title: "Family Dinner Planning",
-    type: "task",
-    dueDate: "2024-03-20",
-    priority: "high",
-    status: "pending",
-    assignedTo: "Mom"
-  },
-  {
-    id: "2",
-    title: "Weekend Getaway",
-    type: "event",
-    dueDate: "2024-03-25",
-    priority: "high",
-    status: "pending",
-    assignedTo: "Dad"
-  },
-  {
-    id: "3",
-    title: "Grocery Shopping",
-    type: "task",
-    dueDate: "2024-03-15",
-    priority: "medium",
-    status: "overdue",
-    assignedTo: "John"
-  }
-];
-
-const fetchPriorityItems = async () => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return mockPriorityItems;
-};
+import { usePriorityItems } from "@/hooks/queries/usePriorityItems";
 
 export const InsightsPanel = () => {
-  const { data: priorityItems, isLoading } = useQuery({
-    queryKey: ['priorityItems'],
-    queryFn: fetchPriorityItems,
-  });
+  const { data: priorityItems, isLoading } = usePriorityItems();
 
   if (isLoading) {
     return (
