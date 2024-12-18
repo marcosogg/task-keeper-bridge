@@ -2,12 +2,13 @@ import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock } from "lucide-react";
+import { Footer } from "@/components/Footer";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <div className="flex">
+      <div className="flex flex-1">
         <Sidebar />
         <main className="flex-1 p-6">
           <div className="max-w-4xl mx-auto space-y-6">
@@ -44,6 +45,7 @@ const PrivacyPolicy = () => {
           </div>
         </main>
       </div>
+      <Footer />
     </div>
   );
 };

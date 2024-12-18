@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Mail, Phone, MessageSquare } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Footer } from "@/components/Footer";
 
 const ContactSupport = () => {
   const { toast } = useToast();
@@ -19,9 +20,9 @@ const ContactSupport = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <div className="flex">
+      <div className="flex flex-1">
         <Sidebar />
         <main className="flex-1 p-6">
           <div className="max-w-4xl mx-auto space-y-6">
@@ -79,6 +80,7 @@ const ContactSupport = () => {
           </div>
         </main>
       </div>
+      <Footer />
     </div>
   );
 };
