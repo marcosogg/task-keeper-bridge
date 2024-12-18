@@ -5,7 +5,9 @@ export const taskSchema = z.object({
   description: z.string().optional(),
   dueDate: z.string().optional(),
   priority: z.enum(["low", "medium", "high"]),
-  status: z.enum(["todo", "in-progress", "completed", "cancelled"]),
+  status: z.enum(["todo", "in_progress", "completed", "cancelled"]),
+  assignedTo: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
 });
 
 export const eventSchema = z.object({
