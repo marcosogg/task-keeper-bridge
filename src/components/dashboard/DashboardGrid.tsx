@@ -3,11 +3,11 @@ import { StatsPanel } from "../StatsPanel";
 
 export const DashboardGrid = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6">
-      <div className="md:col-span-3 w-full">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+      <div className="lg:col-span-7 w-full">
         <InsightsPanel />
       </div>
-      <div className="md:col-span-2 w-full">
+      <div className="lg:col-span-5 w-full">
         <StatsPanel />
       </div>
     </div>
