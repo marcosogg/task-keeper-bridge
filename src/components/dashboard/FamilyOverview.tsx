@@ -1,10 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, Users, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
+import { UserPlus, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFamilyStats } from "@/hooks/queries/useFamilyStats";
+import { FamilyMemberAvatar } from "./family/FamilyMemberAvatar";
+import { FamilyMemberTooltip } from "./family/FamilyMemberTooltip";
+import { FamilyStatistics } from "./family/FamilyStatistics";
 
 export const FamilyOverview = () => {
   const navigate = useNavigate();
@@ -91,85 +94,21 @@ export const FamilyOverview = () => {
             {familyMembers.map((member) => {
               const stats = memberStats?.find(s => s.profile_id === member.profile_id);
               return (
-                <div
+                <FamilyMemberAvatar
                   key={member.id}
-                  className="group relative"
+                  avatarUrl={member.profiles?.avatar_url}
+                  name={member.profiles?.full_name || ''}
+                  email={member.profiles?.email || ''}
                 >
-                  <div
-                    className="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-                    style={{
-                      backgroundColor: member.profiles?.avatar_url
-                        ? 'transparent'
-                        : `hsl(${Math.random() * 360}, 70%, 80%)`,
-                    }}
-                  >
-                    {member.profiles?.avatar_url ? (
-                      <img
-                        src={member.profiles.avatar_url}
-                        alt={member.profiles.full_name || member.profiles.email}
-                        className="h-full w-full rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center text-white font-medium">
-                        {(member.profiles?.full_name || member.profiles?.email || '')
-                          .charAt(0)
-                          .toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                  {stats && (
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block">
-                      <div className="bg-white p-2 rounded-lg shadow-lg text-xs whitespace-nowrap border">
-                        <p className="font-medium">{member.profiles?.full_name || member.profiles?.email}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="flex items-center">
-                            <CheckCircle2 className="h-3 w-3 text-green-500 mr-1" />
-                            {stats.completed_tasks}/{stats.total_tasks}
-                          </span>
-                          {stats.overdue_tasks > 0 && (
-                            <span className="flex items-center text-red-500">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {stats.overdue_tasks} overdue
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  <FamilyMemberTooltip
+                    name={member.profiles?.full_name || member.profiles?.email || 'Unknown'}
+                    stats={stats}
+                  />
+                </FamilyMemberAvatar>
               );
             })}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-100">
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
-              <div>
-                <p className="text-sm font-medium">Completed Tasks</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {memberStats?.reduce((acc, curr) => acc + Number(curr.completed_tasks), 0) || 0}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-50 border border-yellow-100">
-              <Clock className="h-5 w-5 text-yellow-500" />
-              <div>
-                <p className="text-sm font-medium">Active Tasks</p>
-                <p className="text-2xl font-bold text-yellow-600">
-                  {memberStats?.reduce((acc, curr) => 
-                    acc + (Number(curr.total_tasks) - Number(curr.completed_tasks)), 0) || 0}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-100">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
-              <div>
-                <p className="text-sm font-medium">Overdue Tasks</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {memberStats?.reduce((acc, curr) => acc + Number(curr.overdue_tasks), 0) || 0}
-                </p>
-              </div>
-            </div>
-          </div>
+          <FamilyStatistics memberStats={memberStats} />
         </div>
       </CardContent>
     </Card>
