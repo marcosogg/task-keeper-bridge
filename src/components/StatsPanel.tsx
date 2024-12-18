@@ -11,15 +11,30 @@ import { cn } from "@/lib/utils";
 interface Task {
   id: string;
   title: string;
-  date: Date;
+  date: string;  // Changed from Date to string for consistent data handling
   priority: 'high' | 'medium' | 'low';
 }
 
-// Mock data for demonstration
+// Mock data with ISO string dates for consistency
 const mockTasks: Task[] = [
-  { id: '1', title: 'Family Dinner', date: new Date(), priority: 'high' },
-  { id: '2', title: 'Soccer Practice', date: new Date(Date.now() + 86400000), priority: 'medium' },
-  { id: '3', title: 'Grocery Shopping', date: new Date(), priority: 'low' },
+  { 
+    id: '1', 
+    title: 'Family Dinner', 
+    date: new Date().toISOString(), 
+    priority: 'high' 
+  },
+  { 
+    id: '2', 
+    title: 'Soccer Practice', 
+    date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+    priority: 'medium' 
+  },
+  { 
+    id: '3', 
+    title: 'Grocery Shopping', 
+    date: new Date().toISOString(), 
+    priority: 'low' 
+  },
 ];
 
 const fetchTasks = async () => {
