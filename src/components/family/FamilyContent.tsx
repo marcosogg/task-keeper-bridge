@@ -10,6 +10,8 @@ import { CreateFamilyModal } from "./CreateFamilyModal";
 import { useFamilyMembers } from "@/hooks/queries/useFamilyMembers";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const FamilyContent = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -17,18 +19,39 @@ export const FamilyContent = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
-  
-  const { data: familyMembers, isLoading } = useFamilyMembers(user?.id);
 
-  const hasFamily = familyMembers && familyMembers.length > 0;
+  // First, get the user's family
+  const { data: userFamily } = useQuery({
+    queryKey: ['userFamily', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const { data: familyMember } = await supabase
+        .from('family_members')
+        .select('families(*)')
+        .eq('profile_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      return familyMember?.families;
+    },
+    enabled: !!user?.id,
+  });
+  
+  const { data: familyMembers, isLoading } = useFamilyMembers(userFamily?.id);
+
+  const hasFamily = userFamily !== null && userFamily !== undefined;
 
   return (
     <main className="flex-1 p-6 overflow-hidden">
       <div className="flex items-center justify-between mb-6">
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">Family Members</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">Family Groups</h2>
           <p className="text-sm text-muted-foreground">
-            Manage your family group and member roles
+            {hasFamily 
+              ? `Manage your family group "${userFamily?.name}" and member roles`
+              : "Create or join a family group to get started"
+            }
           </p>
         </div>
         <div className="flex items-center gap-2">
