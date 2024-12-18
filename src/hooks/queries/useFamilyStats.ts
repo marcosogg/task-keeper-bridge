@@ -22,9 +22,12 @@ export const useFamilyStats = (familyId: string | undefined) => {
     queryFn: async () => {
       if (!familyId) return null;
       const { data, error } = await supabase
-        .rpc('get_family_member_stats', { family_id_param: familyId });
+        .rpc('get_family_member_stats', { family_id_param: familyId }) as {
+          data: FamilyMemberStats[] | null;
+          error: Error | null;
+        };
       if (error) throw error;
-      return data as FamilyMemberStats[];
+      return data;
     },
     enabled: !!familyId,
   });
@@ -37,9 +40,12 @@ export const useFamilyStats = (familyId: string | undefined) => {
         .rpc('get_family_activity', { 
           family_id_param: familyId,
           limit_param: 5
-        });
+        }) as {
+          data: FamilyActivity[] | null;
+          error: Error | null;
+        };
       if (error) throw error;
-      return data as FamilyActivity[];
+      return data;
     },
     enabled: !!familyId,
   });
