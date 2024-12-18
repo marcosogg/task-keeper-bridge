@@ -1,12 +1,6 @@
-import { CalendarPlus, ListPlus, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { CreateTazqButton } from "@/components/CreateTazqButton";
 
 export const WelcomeBanner = () => {
-  const handleQuickAction = (action: string) => {
-    toast.success(`${action} action initiated`);
-  };
-
   return (
     <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm animate-fadeIn" role="banner">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -16,33 +10,8 @@ export const WelcomeBanner = () => {
             Here's what's happening with your family today.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Button 
-            onClick={() => handleQuickAction("Add Task")}
-            className="flex-1 md:flex-none bg-primary hover:bg-primary-dark text-white transition-colors"
-            aria-label="Add new task"
-          >
-            <ListPlus className="mr-2 h-4 w-4" aria-hidden="true" />
-            Add Task
-          </Button>
-          <Button 
-            onClick={() => handleQuickAction("Schedule Event")}
-            variant="outline"
-            className="flex-1 md:flex-none border-primary text-primary hover:bg-primary/10 transition-colors"
-            aria-label="Create new event"
-          >
-            <CalendarPlus className="mr-2 h-4 w-4" aria-hidden="true" />
-            New Event
-          </Button>
-          <Button 
-            onClick={() => handleQuickAction("Send Message")}
-            variant="outline"
-            className="flex-1 md:flex-none border-primary text-primary hover:bg-primary/10 transition-colors"
-            aria-label="Send new message"
-          >
-            <MessageSquare className="mr-2 h-4 w-4" aria-hidden="true" />
-            Message
-          </Button>
+        <div>
+          <CreateTazqButton />
         </div>
       </div>
     </div>
