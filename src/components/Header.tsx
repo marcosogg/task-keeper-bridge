@@ -8,9 +8,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { NotificationCenter } from "./NotificationCenter";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Header = () => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <header className="w-full bg-white border-b border-gray-200 px-6 py-4">
@@ -21,9 +23,9 @@ export const Header = () => {
           </Link>
           <nav className="hidden md:flex space-x-6">
             <Link
-              to="/"
+              to="/dashboard"
               className={`text-gray-600 hover:text-primary ${
-                location.pathname === "/" ? "text-primary" : ""
+                location.pathname === "/dashboard" ? "text-primary" : ""
               }`}
             >
               Dashboard
@@ -82,9 +84,12 @@ export const Header = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem>
+                <span className="text-sm text-gray-600">{user?.email}</span>
+              </DropdownMenuItem>
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
