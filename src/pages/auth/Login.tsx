@@ -1,19 +1,20 @@
 import { AuthLayout } from "@/components/auth/AuthLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Auth logic will be implemented later with Supabase
-    console.log("Login submitted", { email, password });
-  };
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   return (
     <AuthLayout>
@@ -23,51 +24,22 @@ const Login = () => {
           <p className="text-gray-500">Sign in to continue with TAZQ</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-
-          <div className="flex justify-end">
-            <Link
-              to="/reset-password"
-              className="text-sm text-primary hover:underline"
-            >
-              Forgot Password?
-            </Link>
-          </div>
-
-          <Button type="submit" className="w-full">
-            Sign In
-          </Button>
-
-          <p className="text-center text-sm text-gray-600">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-primary hover:underline">
-              Sign Up
-            </Link>
-          </p>
-        </form>
+        <Auth
+          supabaseClient={supabase}
+          appearance={{
+            theme: ThemeSupa,
+            variables: {
+              default: {
+                colors: {
+                  brand: 'rgb(var(--color-primary))',
+                  brandAccent: 'rgb(var(--color-primary-dark))',
+                },
+              },
+            },
+          }}
+          providers={[]}
+          redirectTo={`${window.location.origin}/dashboard`}
+        />
       </div>
     </AuthLayout>
   );
