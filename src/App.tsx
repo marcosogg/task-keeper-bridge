@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Tasks from "./pages/Tasks";
 import Messages from "./pages/Messages";
@@ -41,19 +42,71 @@ const App = () => {
             <BrowserRouter>
               <AuthProvider>
                 <Routes>
+                  {/* Public routes */}
                   <Route path="/" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/dashboard" element={<Index />} />
-                  <Route path="/tasks" element={<Tasks />} />
-                  <Route path="/messages" element={<Messages />} />
-                  <Route path="/calendar" element={<Calendar />} />
-                  <Route path="/family" element={<Family />} />
-                  <Route path="/help" element={<HelpCenter />} />
-                  <Route path="/contact" element={<ContactSupport />} />
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
+
+                  {/* Protected routes */}
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/tasks"
+                    element={
+                      <ProtectedRoute>
+                        <Tasks />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/messages"
+                    element={
+                      <ProtectedRoute>
+                        <Messages />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/calendar"
+                    element={
+                      <ProtectedRoute>
+                        <Calendar />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/family"
+                    element={
+                      <ProtectedRoute>
+                        <Family />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/help"
+                    element={
+                      <ProtectedRoute>
+                        <HelpCenter />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/contact"
+                    element={
+                      <ProtectedRoute>
+                        <ContactSupport />
+                      </ProtectedRoute>
+                    }
+                  />
                 </Routes>
               </AuthProvider>
             </BrowserRouter>
