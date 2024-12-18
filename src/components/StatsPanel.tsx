@@ -23,9 +23,15 @@ export const StatsPanel = () => {
 
   const getDayTasks = (date: Date) => {
     if (!tasks) return [];
-    return tasks.filter(task => 
-      format(parseISO(task.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-    );
+    return tasks.filter(task => {
+      try {
+        if (!task.date) return false;
+        return format(parseISO(task.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
+      } catch (e) {
+        console.error('Error parsing date:', e);
+        return false;
+      }
+    });
   };
 
   const handleDayClick = (date: Date) => {
