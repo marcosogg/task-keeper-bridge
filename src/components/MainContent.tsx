@@ -5,22 +5,29 @@ import { StatsPanel } from "./StatsPanel";
 
 export const MainContent = () => {
   return (
-    <main className="flex-1 bg-gray-50 p-6">
+    <main className="flex-1 bg-gray-50 p-6" role="main" aria-label="Dashboard main content">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Welcome Banner */}
-        <div className="bg-white rounded-xl p-6 shadow-sm animate-fadeIn">
+        <div className="bg-white rounded-xl p-6 shadow-sm animate-fadeIn" role="banner">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Welcome back, Sarah!</h1>
-              <p className="text-gray-600 mt-1">Here's what's happening with your family today.</p>
+              <p className="text-gray-600 mt-1" role="status">Here's what's happening with your family today.</p>
             </div>
             <div className="flex space-x-3">
-              <Button className="bg-primary hover:bg-primary-dark">
-                <ListPlus className="mr-2 h-4 w-4" />
+              <Button 
+                className="bg-primary hover:bg-primary-dark"
+                aria-label="Add new task"
+              >
+                <ListPlus className="mr-2 h-4 w-4" aria-hidden="true" />
                 Add Task
               </Button>
-              <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
-                <CalendarPlus className="mr-2 h-4 w-4" />
+              <Button 
+                variant="outline" 
+                className="border-primary text-primary hover:bg-primary/10"
+                aria-label="Create new event"
+              >
+                <CalendarPlus className="mr-2 h-4 w-4" aria-hidden="true" />
                 New Event
               </Button>
             </div>
@@ -34,16 +41,23 @@ export const MainContent = () => {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
-          <div className="space-y-4">
+        <div className="bg-white rounded-xl p-6 shadow-sm" role="region" aria-label="Recent activity">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4" id="recent-activity-heading">Recent Activity</h2>
+          <div className="space-y-4" aria-labelledby="recent-activity-heading">
             {[
               { user: "Mom", action: "completed", item: "Grocery Shopping" },
               { user: "Dad", action: "added", item: "Family Dinner" },
               { user: "John", action: "updated", item: "Weekend Plans" },
             ].map((activity, index) => (
-              <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-white text-sm">
+              <div 
+                key={index} 
+                className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+                role="listitem"
+              >
+                <div 
+                  className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-white text-sm"
+                  aria-hidden="true"
+                >
                   {activity.user[0]}
                 </div>
                 <div>

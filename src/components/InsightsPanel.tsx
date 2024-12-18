@@ -14,7 +14,6 @@ interface PriorityItem {
   assignedTo: string;
 }
 
-// Mock data - replace with actual API call later
 const mockPriorityItems: PriorityItem[] = [
   {
     id: "1",
@@ -46,7 +45,6 @@ const mockPriorityItems: PriorityItem[] = [
 ];
 
 const fetchPriorityItems = async () => {
-  // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 1000));
   return mockPriorityItems;
 };
@@ -76,33 +74,38 @@ export const InsightsPanel = () => {
   }
 
   return (
-    <Card className="w-full animate-fadeIn">
+    <Card className="w-full animate-fadeIn" role="region" aria-label="Family insights">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-2xl font-bold">Family Insights</CardTitle>
-        <Button variant="outline" className="text-primary">
+        <CardTitle className="text-2xl font-bold" id="insights-heading">Family Insights</CardTitle>
+        <Button 
+          variant="outline" 
+          className="text-primary"
+          aria-label="View all insights"
+        >
           View All
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-4" role="list" aria-labelledby="insights-heading">
           {priorityItems?.map((item) => (
             <div
               key={item.id}
               className="flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50"
+              role="listitem"
             >
               <div className="flex items-center space-x-4">
                 {item.status === "overdue" ? (
-                  <AlertTriangle className="h-5 w-5 text-red-500" aria-label="Overdue" />
+                  <AlertTriangle className="h-5 w-5 text-red-500" aria-label="Overdue item" />
                 ) : item.priority === "high" ? (
-                  <Clock className="h-5 w-5 text-yellow-500" aria-label="High Priority" />
+                  <Clock className="h-5 w-5 text-yellow-500" aria-label="High priority item" />
                 ) : (
-                  <CheckCircle2 className="h-5 w-5 text-green-500" aria-label="Normal Priority" />
+                  <CheckCircle2 className="h-5 w-5 text-green-500" aria-label="Normal priority item" />
                 )}
                 <div>
                   <p className="font-medium text-gray-900">{item.title}</p>
                   <div className="flex items-center space-x-2 text-sm text-gray-500">
                     <span>Due: {new Date(item.dueDate).toLocaleDateString()}</span>
-                    <span>•</span>
+                    <span aria-hidden="true">•</span>
                     <span>Assigned to: {item.assignedTo}</span>
                   </div>
                 </div>
@@ -111,6 +114,7 @@ export const InsightsPanel = () => {
                 size="sm" 
                 variant={item.status === "overdue" ? "destructive" : "default"}
                 className="min-w-[100px]"
+                aria-label={`Take action on ${item.title}`}
               >
                 Take Action
               </Button>

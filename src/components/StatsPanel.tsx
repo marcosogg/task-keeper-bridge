@@ -21,7 +21,6 @@ const mockData: WeeklyActivity[] = [
 ];
 
 const fetchWeeklyActivity = async () => {
-  // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 1000));
   return mockData;
 };
@@ -55,37 +54,49 @@ export const StatsPanel = () => {
   }
 
   return (
-    <Card className="w-full animate-fadeIn">
+    <Card className="w-full animate-fadeIn" role="region" aria-label="Weekly activity statistics">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold">Weekly Activity</CardTitle>
+        <CardTitle className="text-xl font-semibold" id="stats-heading">Weekly Activity</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[200px] w-full" role="img" aria-label="Bar chart showing weekly activity">
+        <div 
+          className="h-[200px] w-full" 
+          role="img" 
+          aria-label="Bar chart showing weekly activity distribution between tasks and events"
+        >
           <ChartContainer config={config}>
             <ResponsiveContainer>
-              <BarChart data={weeklyActivity} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <BarChart 
+                data={weeklyActivity} 
+                margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+              >
                 <XAxis 
                   dataKey="name" 
                   tick={{ fill: '#666' }}
                   axisLine={{ stroke: '#e5e7eb' }}
+                  aria-label="Days of the week"
                 />
                 <YAxis 
                   tick={{ fill: '#666' }}
                   axisLine={{ stroke: '#e5e7eb' }}
+                  aria-label="Number of activities"
                 />
                 <Tooltip
                   content={({ active, payload }) => {
                     if (!active || !payload) return null;
                     return (
-                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                      <div 
+                        className="rounded-lg border bg-background p-2 shadow-sm"
+                        role="tooltip"
+                      >
                         <div className="grid grid-cols-2 gap-2">
                           <div className="flex items-center gap-1">
-                            <div className="h-2 w-2 rounded-full bg-primary" />
+                            <div className="h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
                             <span className="text-sm font-medium">Tasks:</span>
                           </div>
                           <div className="text-sm font-medium">{payload[0]?.value}</div>
                           <div className="flex items-center gap-1">
-                            <div className="h-2 w-2 rounded-full bg-accent" />
+                            <div className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
                             <span className="text-sm font-medium">Events:</span>
                           </div>
                           <div className="text-sm font-medium">{payload[1]?.value}</div>
@@ -99,12 +110,16 @@ export const StatsPanel = () => {
                   fill={config.tasks.color} 
                   radius={[4, 4, 0, 0]} 
                   name="Tasks"
+                  role="graphics-symbol"
+                  aria-label="Tasks bar"
                 />
                 <Bar 
                   dataKey="events" 
                   fill={config.events.color} 
                   radius={[4, 4, 0, 0]} 
                   name="Events"
+                  role="graphics-symbol"
+                  aria-label="Events bar"
                 />
               </BarChart>
             </ResponsiveContainer>
