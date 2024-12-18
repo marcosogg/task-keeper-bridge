@@ -57,7 +57,7 @@ export const InsightsPanel = () => {
 
   if (isLoading) {
     return (
-      <Card className="w-full animate-fadeIn">
+      <Card className="w-full h-full animate-fadeIn">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">Family Insights</CardTitle>
           <Skeleton className="h-10 w-20" />
@@ -74,7 +74,7 @@ export const InsightsPanel = () => {
   }
 
   return (
-    <Card className="w-full animate-fadeIn" role="region" aria-label="Family insights">
+    <Card className="w-full h-full animate-fadeIn" role="region" aria-label="Family insights">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold" id="insights-heading">Family Insights</CardTitle>
         <Button 

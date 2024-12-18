@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Task {
   id: string;
@@ -73,8 +72,8 @@ export const StatsPanel = () => {
   };
 
   return (
-    <Card className="w-full animate-fadeIn">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <Card className="w-full h-full flex flex-col animate-fadeIn">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 flex-shrink-0">
         <CardTitle className="text-xl font-semibold">Calendar</CardTitle>
         <Button 
           variant="outline" 
@@ -84,8 +83,8 @@ export const StatsPanel = () => {
           Today
         </Button>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="flex-grow">
+        <div className="h-full flex flex-col">
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -94,7 +93,7 @@ export const StatsPanel = () => {
             onMonthChange={setCurrentMonth}
             modifiers={modifiers}
             modifiersStyles={modifiersStyles}
-            className="rounded-md border"
+            className="rounded-md border flex-grow w-full"
             components={{
               DayContent: ({ date }) => {
                 const dayTasks = getDayTasks(date);
