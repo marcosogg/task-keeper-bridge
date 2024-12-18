@@ -27,8 +27,8 @@ export const CalendarContent = () => {
     if (!tasks) return [];
     return tasks.filter(task => {
       try {
-        if (!task.date) return false;
-        return format(parseISO(task.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
+        if (!task.dueDate) return false;
+        return format(parseISO(task.dueDate), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
       } catch (e) {
         console.error('Error parsing date:', e);
         return false;

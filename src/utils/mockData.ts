@@ -4,20 +4,35 @@ export const mockTasks: Task[] = [
   { 
     id: '1', 
     title: 'Family Dinner', 
-    date: new Date().toISOString(), 
-    priority: 'high' 
+    dueDate: new Date().toISOString(),
+    priority: 'high',
+    status: 'todo',
+    createdBy: 'user1',
+    familyId: 'family1',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   { 
     id: '2', 
     title: 'Soccer Practice', 
-    date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-    priority: 'medium' 
+    dueDate: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+    priority: 'medium',
+    status: 'todo',
+    createdBy: 'user1',
+    familyId: 'family1',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   { 
     id: '3', 
     title: 'Grocery Shopping', 
-    date: new Date().toISOString(), 
-    priority: 'low' 
+    dueDate: new Date().toISOString(),
+    priority: 'low',
+    status: 'todo',
+    createdBy: 'user1',
+    familyId: 'family1',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
 ];
 
