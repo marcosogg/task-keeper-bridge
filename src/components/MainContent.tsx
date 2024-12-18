@@ -113,11 +113,11 @@ export const MainContent = () => {
         </div>
 
         {/* Insights and Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <div className="w-full">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6">
+          <div className="md:col-span-3 w-full">
             <InsightsPanel />
           </div>
-          <div className="w-full">
+          <div className="md:col-span-2 w-full">
             <StatsPanel />
           </div>
         </div>
