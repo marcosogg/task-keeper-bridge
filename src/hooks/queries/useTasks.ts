@@ -9,7 +9,8 @@ interface TaskResponse {
   status: 'todo' | 'in_progress' | 'completed';
   priority: 'low' | 'medium' | 'high';
   due_date: string | null;
-  assigned_to: {
+  assigned_to: string | null;
+  profile: {
     full_name: string | null;
     email: string | null;
   } | null;
@@ -28,7 +29,7 @@ export const useTasks = () => {
         .from('tasks')
         .select(`
           *,
-          assigned_to:profiles!tasks_assigned_to_fkey (
+          profile:profiles!tasks_assigned_to_fkey (
             full_name,
             email
           )
@@ -47,13 +48,13 @@ export const useTasks = () => {
         status: task.status,
         priority: task.priority,
         dueDate: task.due_date || undefined,
-        assignedTo: task.assigned_to ? [task.assigned_to.full_name || task.assigned_to.email || 'Unknown'] : [],
+        assignedTo: task.profile ? [task.profile.full_name || task.profile.email || 'Unknown'] : [],
         createdBy: task.created_by,
         familyId: task.family_id,
         createdAt: task.created_at,
         updatedAt: task.updated_at,
         completedAt: task.completed_at || undefined,
-        assigned_to: task.assigned_to || undefined
+        assigned_to: task.profile || undefined
       })) as Task[];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
