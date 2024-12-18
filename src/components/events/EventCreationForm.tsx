@@ -52,15 +52,17 @@ export const EventCreationForm = ({ onCancel, onSuccess }: EventCreationFormProp
 
       if (familyError) throw familyError;
 
-      const { error } = await supabase.from('events').insert({
-        title: data.title,
-        description: data.description,
-        start_date: startDate?.toISOString(),
-        end_date: endDate?.toISOString(),
-        location: data.location,
-        created_by: user.id,
-        family_id: familyMember.family_id
-      });
+      const { error } = await supabase
+        .from('events')
+        .insert({
+          title: data.title,
+          description: data.description,
+          start_date: startDate?.toISOString(),
+          end_date: endDate?.toISOString(),
+          location: data.location,
+          created_by: user.id,
+          family_id: familyMember.family_id
+        });
 
       if (error) throw error;
 

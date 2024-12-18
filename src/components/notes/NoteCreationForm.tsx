@@ -49,13 +49,15 @@ export const NoteCreationForm = ({ onCancel, onSuccess }: NoteCreationFormProps)
 
       if (familyError) throw familyError;
 
-      const { error } = await supabase.from('notes').insert({
-        title: data.title,
-        content: data.content,
-        is_checklist: isChecklist,
-        created_by: user.id,
-        family_id: familyMember.family_id
-      });
+      const { error } = await supabase
+        .from('notes')
+        .insert({
+          title: data.title,
+          content: data.content,
+          is_checklist: isChecklist,
+          created_by: user.id,
+          family_id: familyMember.family_id
+        });
 
       if (error) throw error;
 
