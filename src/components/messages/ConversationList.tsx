@@ -3,6 +3,8 @@ import { MessageSquarePlus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Conversation } from "./MessagesContent";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { CreateMessageModal } from "./CreateMessageModal";
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -17,11 +19,17 @@ export const ConversationList = ({
   onSelect,
   className
 }: ConversationListProps) => {
+  const [isCreateMessageModalOpen, setIsCreateMessageModalOpen] = useState(false);
+
   return (
     <div className={cn("flex flex-col", className)}>
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="flex-1">
+          <Button 
+            variant="outline" 
+            className="flex-1"
+            onClick={() => setIsCreateMessageModalOpen(true)}
+          >
             <MessageSquarePlus className="h-4 w-4 mr-2" />
             New Message
           </Button>
@@ -66,6 +74,10 @@ export const ConversationList = ({
           </button>
         ))}
       </div>
+      <CreateMessageModal 
+        open={isCreateMessageModalOpen}
+        onOpenChange={setIsCreateMessageModalOpen}
+      />
     </div>
   );
 };
