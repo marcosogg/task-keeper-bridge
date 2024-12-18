@@ -7,7 +7,7 @@ import { TaskDialog } from "./TaskDialog";
 import { CalendarWrapper } from "./CalendarWrapper";
 import { fetchTasks } from "@/utils/mockData";
 import { CreateTazqButton } from "../CreateTazqButton";
-import { ViewDay, ViewMonth, ViewWeek } from "lucide-react";
+import { Calendar, List, Clock } from "lucide-react";
 import type { Task } from "@/types/task";
 
 type CalendarView = "month" | "week" | "day";
@@ -66,7 +66,7 @@ export const CalendarContent = () => {
                 size="sm"
                 onClick={() => setView("month")}
               >
-                <ViewMonth className="h-4 w-4 mr-1" />
+                <Calendar className="h-4 w-4 mr-1" />
                 Month
               </Button>
               <Button 
@@ -74,7 +74,7 @@ export const CalendarContent = () => {
                 size="sm"
                 onClick={() => setView("week")}
               >
-                <ViewWeek className="h-4 w-4 mr-1" />
+                <List className="h-4 w-4 mr-1" />
                 Week
               </Button>
               <Button 
@@ -82,7 +82,7 @@ export const CalendarContent = () => {
                 size="sm"
                 onClick={() => setView("day")}
               >
-                <ViewDay className="h-4 w-4 mr-1" />
+                <Clock className="h-4 w-4 mr-1" />
                 Day
               </Button>
             </div>
