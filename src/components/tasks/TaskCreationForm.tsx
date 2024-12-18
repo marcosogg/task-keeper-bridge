@@ -11,18 +11,31 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-export const TaskCreationForm = () => {
+interface TaskCreationFormProps {
+  onCancel?: () => void;
+  onSuccess?: () => void;
+}
+
+export const TaskCreationForm = ({ onCancel, onSuccess }: TaskCreationFormProps) => {
   const [date, setDate] = useState<Date>();
   const [priority, setPriority] = useState("medium");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically handle the form submission
     toast.success("Task created successfully!");
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
         <div>
           <Label htmlFor="title">Task Title</Label>
@@ -120,7 +133,7 @@ export const TaskCreationForm = () => {
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t">
-        <Button variant="outline" type="button">
+        <Button variant="outline" type="button" onClick={handleCancel}>
           Cancel
         </Button>
         <Button type="submit">

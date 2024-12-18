@@ -2,6 +2,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Calendar, FileText, ListCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useState } from "react";
+import { TaskCreationForm } from "./tasks/TaskCreationForm";
 
 interface CreateTazqModalProps {
   open: boolean;
@@ -9,10 +11,29 @@ interface CreateTazqModalProps {
 }
 
 export const CreateTazqModal = ({ open, onOpenChange }: CreateTazqModalProps) => {
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+
   const handleOptionSelect = (type: string) => {
-    toast.success(`Creating new ${type}`);
+    setSelectedType(type);
+  };
+
+  const handleClose = () => {
+    setSelectedType(null);
     onOpenChange(false);
   };
+
+  if (selectedType === "task") {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">Create New Task</DialogTitle>
+          </DialogHeader>
+          <TaskCreationForm onCancel={handleClose} onSuccess={handleClose} />
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
