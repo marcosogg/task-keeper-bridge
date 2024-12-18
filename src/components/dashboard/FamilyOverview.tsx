@@ -1,17 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { UserPlus, Users } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFamilyStats } from "@/hooks/queries/useFamilyStats";
-import { FamilyMemberAvatar } from "./family/FamilyMemberAvatar";
-import { FamilyMemberTooltip } from "./family/FamilyMemberTooltip";
-import { FamilyStatistics } from "./family/FamilyStatistics";
 import { useAuth } from "@/contexts/AuthContext";
+import { LoadingState } from "./family/LoadingState";
+import { EmptyFamilyState } from "./family/EmptyFamilyState";
+import { FamilyHeader } from "./family/FamilyHeader";
+import { FamilyMembersList } from "./family/FamilyMembersList";
+import { FamilyStatistics } from "./family/FamilyStatistics";
 
 export const FamilyOverview = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const { data: familyMembers, isLoading } = useQuery({
@@ -46,74 +44,21 @@ export const FamilyOverview = () => {
   const { memberStats, isLoading: isLoadingStats } = useFamilyStats(familyId);
 
   if (isLoading || isLoadingStats) {
-    return (
-      <Card>
-        <CardHeader>
-          <div className="h-7 w-40 bg-gray-200 rounded animate-pulse" />
-        </CardHeader>
-        <CardContent>
-          <div className="h-20 bg-gray-100 rounded animate-pulse" />
-        </CardContent>
-      </Card>
-    );
+    return <LoadingState />;
   }
 
   if (!familyMembers?.length) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Get Started with Your Family</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            Create or join a family group to start managing tasks and events together.
-          </p>
-          <div className="flex gap-4">
-            <Button onClick={() => navigate('/family')}>
-              <Users className="mr-2 h-4 w-4" />
-              Create Family
-            </Button>
-            <Button variant="outline">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Join Family
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <EmptyFamilyState />;
   }
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl font-bold">
-          {familyMembers[0]?.families?.name || 'Your Family'}
-        </CardTitle>
-        <Button variant="outline" size="sm" onClick={() => navigate('/family')}>
-          <Users className="mr-2 h-4 w-4" />
-          Manage Family
-        </Button>
+      <CardHeader>
+        <FamilyHeader familyName={familyMembers[0]?.families?.name || 'Your Family'} />
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <div className="flex -space-x-2 overflow-hidden">
-            {familyMembers.map((member) => {
-              const stats = memberStats?.find(s => s.profile_id === member.profile_id);
-              return (
-                <FamilyMemberAvatar
-                  key={member.id}
-                  avatarUrl={member.profiles?.avatar_url}
-                  name={member.profiles?.full_name || ''}
-                  email={member.profiles?.email || ''}
-                >
-                  <FamilyMemberTooltip
-                    name={member.profiles?.full_name || member.profiles?.email || 'Unknown'}
-                    stats={stats}
-                  />
-                </FamilyMemberAvatar>
-              );
-            })}
-          </div>
+          <FamilyMembersList members={familyMembers} memberStats={memberStats} />
           <FamilyStatistics memberStats={memberStats} />
         </div>
       </CardContent>
