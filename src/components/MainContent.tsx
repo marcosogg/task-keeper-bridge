@@ -68,7 +68,6 @@ const getPriorityColor = (priority: ActivityItem["priority"]) => {
 
 export const MainContent = () => {
   const handleQuickAction = (action: string) => {
-    // This is a placeholder for actual functionality
     toast.success(`${action} action initiated`);
   };
 
@@ -114,9 +113,13 @@ export const MainContent = () => {
         </div>
 
         {/* Insights and Stats */}
-        <div className="grid gap-4 md:gap-6 md:grid-cols-2">
-          <InsightsPanel />
-          <StatsPanel />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <div className="w-full">
+            <InsightsPanel />
+          </div>
+          <div className="w-full">
+            <StatsPanel />
+          </div>
         </div>
 
         {/* Recent Activity */}
