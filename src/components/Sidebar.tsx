@@ -1,25 +1,30 @@
 import { Calendar, Home, MessageSquare, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocation } from "react-router-dom";
 
 interface NavItemProps {
   icon: React.ElementType;
   label: string;
-  isActive?: boolean;
   href: string;
 }
 
-const NavItem = ({ icon: Icon, label, isActive, href }: NavItemProps) => (
-  <a 
-    href={href}
-    className={cn(
-      "flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors",
-      isActive ? "bg-primary/10 text-primary" : "text-gray-600 hover:bg-gray-100"
-    )}
-  >
-    <Icon className="h-5 w-5" />
-    <span className="font-medium">{label}</span>
-  </a>
-);
+const NavItem = ({ icon: Icon, label, href }: NavItemProps) => {
+  const location = useLocation();
+  const isActive = location.pathname === href;
+
+  return (
+    <a 
+      href={href}
+      className={cn(
+        "flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors",
+        isActive ? "bg-primary/10 text-primary" : "text-gray-600 hover:bg-gray-100"
+      )}
+    >
+      <Icon className="h-5 w-5" />
+      <span className="font-medium">{label}</span>
+    </a>
+  );
+};
 
 export const Sidebar = () => {
   return (
@@ -40,23 +45,22 @@ export const Sidebar = () => {
           <NavItem 
             icon={Home} 
             label="Dashboard" 
-            isActive={true}
-            href="#"
+            href="/"
           />
           <NavItem 
             icon={Users} 
             label="Family" 
-            href="#"
+            href="/family"
           />
           <NavItem 
             icon={Calendar} 
-            label="Calendar" 
-            href="#"
+            label="Tasks" 
+            href="/tasks"
           />
           <NavItem 
             icon={MessageSquare} 
             label="Messages" 
-            href="#"
+            href="/messages"
           />
         </nav>
         

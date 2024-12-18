@@ -7,18 +7,41 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { NotificationCenter } from "./NotificationCenter";
+import { Link, useLocation } from "react-router-dom";
 
 export const Header = () => {
+  const location = useLocation();
+
   return (
     <header className="w-full bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-8">
-          <h1 className="text-2xl font-bold text-primary-dark">TAZQ</h1>
+          <Link to="/" className="text-2xl font-bold text-primary-dark">TAZQ</Link>
           <nav className="hidden md:flex space-x-6">
-            <a href="#" className="text-gray-600 hover:text-primary">Dashboard</a>
-            <a href="#" className="text-gray-600 hover:text-primary">Tasks</a>
-            <a href="#" className="text-gray-600 hover:text-primary">Calendar</a>
-            <a href="#" className="text-gray-600 hover:text-primary">Messages</a>
+            <Link 
+              to="/" 
+              className={`text-gray-600 hover:text-primary ${location.pathname === "/" ? "text-primary" : ""}`}
+            >
+              Dashboard
+            </Link>
+            <Link 
+              to="/tasks" 
+              className={`text-gray-600 hover:text-primary ${location.pathname === "/tasks" ? "text-primary" : ""}`}
+            >
+              Tasks
+            </Link>
+            <Link 
+              to="/calendar" 
+              className={`text-gray-600 hover:text-primary ${location.pathname === "/calendar" ? "text-primary" : ""}`}
+            >
+              Calendar
+            </Link>
+            <Link 
+              to="/messages" 
+              className={`text-gray-600 hover:text-primary ${location.pathname === "/messages" ? "text-primary" : ""}`}
+            >
+              Messages
+            </Link>
           </nav>
         </div>
         
