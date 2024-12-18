@@ -6,6 +6,7 @@ import { format, parseISO } from "date-fns";
 import { TaskDialog } from "./calendar/TaskDialog";
 import { CalendarWrapper } from "./calendar/CalendarWrapper";
 import { fetchTasks } from "@/utils/mockData";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Task } from "@/types/task";
 
 export const StatsPanel = () => {
@@ -38,12 +39,19 @@ export const StatsPanel = () => {
 
   if (isLoading) {
     return (
-      <Card className="w-full h-full animate-pulse">
-        <CardHeader>
-          <CardTitle>Calendar</CardTitle>
+      <Card className="w-full h-full">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-xl font-semibold">Calendar</CardTitle>
+          <Skeleton className="h-9 w-[100px]" />
         </CardHeader>
         <CardContent>
-          <div className="h-[400px] bg-gray-100 rounded-lg" />
+          <div className="space-y-4">
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: 35 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-square rounded-md" />
+              ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
     );

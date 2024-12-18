@@ -1,6 +1,7 @@
 import { Clock, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Task {
   id: string;
@@ -51,9 +52,24 @@ export const TaskList = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4" role="list" aria-label="Loading tasks">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />
+          <div
+            key={i}
+            className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm"
+          >
+            <div className="flex items-center space-x-4">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-24" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+          </div>
         ))}
       </div>
     );
