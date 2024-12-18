@@ -16,12 +16,24 @@ export const eventSchema = z.object({
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().optional(),
   location: z.string().optional(),
+  attendees: z.array(z.string()).optional(),
+  isRecurring: z.boolean().optional(),
+  recurrencePattern: z.string().optional(),
+  reminder: z.boolean().optional(),
+  reminderTime: z.string().optional(),
 });
 
 export const noteSchema = z.object({
   title: z.string().optional(),
   content: z.string().min(1, "Content is required"),
   isChecklist: z.boolean().default(false),
+  checklistItems: z.array(z.object({
+    content: z.string(),
+    completed: z.boolean(),
+    order: z.number(),
+  })).optional(),
+  tags: z.array(z.string()).optional(),
+  pinned: z.boolean().optional(),
 });
 
 export const signUpSchema = z.object({
