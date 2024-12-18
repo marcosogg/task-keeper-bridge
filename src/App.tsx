@@ -9,6 +9,9 @@ import Messages from "./pages/Messages";
 import Calendar from "./pages/Calendar";
 import Family from "./pages/Family";
 import Landing from "./pages/auth/Landing";
+import Login from "./pages/auth/Login";
+import SignUp from "./pages/auth/SignUp";
+import ResetPassword from "./pages/auth/ResetPassword";
 import HelpCenter from "./pages/support/HelpCenter";
 import ContactSupport from "./pages/support/ContactSupport";
 import TermsOfService from "./pages/support/TermsOfService";
@@ -24,6 +27,9 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/dashboard" element={<Index />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/messages" element={<Messages />} />
