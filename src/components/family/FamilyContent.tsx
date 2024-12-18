@@ -6,37 +6,16 @@ import { UserPlus, Settings, Users } from "lucide-react";
 import { InviteMemberModal } from "./InviteMemberModal";
 import { FamilyMemberCard } from "./FamilyMemberCard";
 import { FamilyGroupSettings } from "./FamilyGroupSettings";
-
-const mockFamilyMembers = [
-  {
-    id: 1,
-    name: "John Doe",
-    role: "Parent",
-    avatar: "JD",
-    status: "online",
-    email: "john@example.com"
-  },
-  {
-    id: 2,
-    name: "Jane Doe",
-    role: "Parent",
-    avatar: "JD",
-    status: "offline",
-    email: "jane@example.com"
-  },
-  {
-    id: 3,
-    name: "Tommy Doe",
-    role: "Child",
-    avatar: "TD",
-    status: "online",
-    email: "tommy@example.com"
-  }
-];
+import { useFamilyMembers } from "@/hooks/queries/useFamilyMembers";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const FamilyContent = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const { user } = useAuth();
+  
+  // For now, we'll just get the first family the user is a member of
+  const { data: familyMembers, isLoading } = useFamilyMembers(user?.id);
 
   return (
     <main className="flex-1 p-6 overflow-hidden">
@@ -70,16 +49,37 @@ export const FamilyContent = () => {
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                {mockFamilyMembers.length} members
+                {familyMembers?.length || 0} members
               </span>
             </div>
           </div>
           <ScrollArea className="h-[calc(100vh-20rem)]">
-            <div className="space-y-4">
-              {mockFamilyMembers.map((member) => (
-                <FamilyMemberCard key={member.id} member={member} />
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-20 bg-muted animate-pulse rounded-lg"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {familyMembers?.map((member) => (
+                  <FamilyMemberCard
+                    key={member.id}
+                    member={{
+                      id: member.id,
+                      name: member.profiles?.full_name || member.profiles?.email || 'Unknown',
+                      role: member.role,
+                      avatar: member.profiles?.avatar_url || member.profiles?.full_name?.charAt(0) || 'U',
+                      status: member.status,
+                      email: member.profiles?.email || ''
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </ScrollArea>
         </Card>
 
