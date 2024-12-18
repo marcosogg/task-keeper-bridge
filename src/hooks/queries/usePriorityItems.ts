@@ -1,46 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
-import type { PriorityItem } from "@/types/common";
-
-const fetchPriorityItems = async () => {
-  // Simulating API call with mock data
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return mockPriorityItems;
-};
-
-const mockPriorityItems: PriorityItem[] = [
-  {
-    id: "1",
-    title: "Family Dinner Planning",
-    type: "task",
-    dueDate: "2024-03-20",
-    priority: "high",
-    status: "pending",
-    assignedTo: "Mom"
-  },
-  {
-    id: "2",
-    title: "Weekend Getaway",
-    type: "event",
-    dueDate: "2024-03-25",
-    priority: "high",
-    status: "pending",
-    assignedTo: "Dad"
-  },
-  {
-    id: "3",
-    title: "Grocery Shopping",
-    type: "task",
-    dueDate: "2024-03-15",
-    priority: "medium",
-    status: "overdue",
-    assignedTo: "John"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export const usePriorityItems = () => {
   return useQuery({
     queryKey: ['priorityItems'],
-    queryFn: fetchPriorityItems,
+    queryFn: async () => {
+      const { data: tasks, error } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          assigned_to:profiles!tasks_assigned_to_fkey (
+            full_name,
+            email
+          )
+        `)
+        .order('due_date', { ascending: true })
+        .limit(5);
+
+      if (error) throw error;
+
+      return tasks.map(task => ({
+        id: task.id,
+        title: task.title,
+        type: 'task',
+        dueDate: task.due_date,
+        priority: task.priority,
+        status: task.status === 'completed' ? 'completed' : 
+               new Date(task.due_date) < new Date() ? 'overdue' : 'pending',
+        assignedTo: task.assigned_to?.full_name || task.assigned_to?.email || 'Unassigned'
+      }));
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
