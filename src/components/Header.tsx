@@ -16,35 +16,53 @@ export const Header = () => {
     <header className="w-full bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-8">
-          <Link to="/" className="text-2xl font-bold text-primary-dark">TAZQ</Link>
+          <Link to="/" className="text-2xl font-bold text-primary-dark">
+            TAZQ
+          </Link>
           <nav className="hidden md:flex space-x-6">
-            <Link 
-              to="/" 
-              className={`text-gray-600 hover:text-primary ${location.pathname === "/" ? "text-primary" : ""}`}
+            <Link
+              to="/"
+              className={`text-gray-600 hover:text-primary ${
+                location.pathname === "/" ? "text-primary" : ""
+              }`}
             >
               Dashboard
             </Link>
-            <Link 
-              to="/tasks" 
-              className={`text-gray-600 hover:text-primary ${location.pathname === "/tasks" ? "text-primary" : ""}`}
+            <Link
+              to="/tasks"
+              className={`text-gray-600 hover:text-primary ${
+                location.pathname === "/tasks" ? "text-primary" : ""
+              }`}
             >
               Tasks
             </Link>
-            <Link 
-              to="/calendar" 
-              className={`text-gray-600 hover:text-primary ${location.pathname === "/calendar" ? "text-primary" : ""}`}
+            <Link
+              to="/calendar"
+              className={`text-gray-600 hover:text-primary ${
+                location.pathname === "/calendar" ? "text-primary" : ""
+              }`}
             >
               Calendar
             </Link>
-            <Link 
-              to="/messages" 
-              className={`text-gray-600 hover:text-primary ${location.pathname === "/messages" ? "text-primary" : ""}`}
+            <Link
+              to="/messages"
+              className={`text-gray-600 hover:text-primary ${
+                location.pathname === "/messages" ? "text-primary" : ""
+              }`}
             >
               Messages
             </Link>
+            <Link
+              to="/family"
+              className={`text-gray-600 hover:text-primary ${
+                location.pathname === "/family" ? "text-primary" : ""
+              }`}
+            >
+              Family
+            </Link>
           </nav>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           <div className="hidden md:flex relative">
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
@@ -54,9 +72,9 @@ export const Header = () => {
               className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
-          
+
           <NotificationCenter />
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">

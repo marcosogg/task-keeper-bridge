@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Tasks from "./pages/Tasks";
 import Messages from "./pages/Messages";
 import Calendar from "./pages/Calendar";
+import Family from "./pages/Family";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/calendar" element={<Calendar />} />
+          <Route path="/family" element={<Family />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
