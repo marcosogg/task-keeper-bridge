@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Calendar, FileText, ListCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { useState } from "react";
 import { TaskCreationForm } from "./tasks/TaskCreationForm";
+import { EventCreationForm } from "./events/EventCreationForm";
+import { NoteCreationForm } from "./notes/NoteCreationForm";
 
 interface CreateTazqModalProps {
   open: boolean;
@@ -30,6 +31,32 @@ export const CreateTazqModal = ({ open, onOpenChange }: CreateTazqModalProps) =>
             <DialogTitle className="text-center text-xl">Create New Task</DialogTitle>
           </DialogHeader>
           <TaskCreationForm onCancel={handleClose} onSuccess={handleClose} />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (selectedType === "event") {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">Schedule New Event</DialogTitle>
+          </DialogHeader>
+          <EventCreationForm onCancel={handleClose} onSuccess={handleClose} />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (selectedType === "note") {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">Create New Note</DialogTitle>
+          </DialogHeader>
+          <NoteCreationForm onCancel={handleClose} onSuccess={handleClose} />
         </DialogContent>
       </Dialog>
     );
