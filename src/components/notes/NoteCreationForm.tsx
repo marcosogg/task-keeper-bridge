@@ -7,6 +7,8 @@ import { NoteFormTitle } from "./form/NoteFormTitle";
 import { NoteFormContent } from "./form/NoteFormContent";
 import { NoteFormActions } from "./form/NoteFormActions";
 import { NoteFormButtons } from "./form/NoteFormButtons";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import type { z } from "zod";
 
 type NoteFormValues = z.infer<typeof noteSchema>;
@@ -18,6 +20,8 @@ interface NoteCreationFormProps {
 
 export const NoteCreationForm = ({ onCancel, onSuccess }: NoteCreationFormProps) => {
   const [isChecklist, setIsChecklist] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
 
   const form = useForm<NoteFormValues>({
     resolver: zodResolver(noteSchema),
@@ -28,11 +32,42 @@ export const NoteCreationForm = ({ onCancel, onSuccess }: NoteCreationFormProps)
     },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    console.log("Form data:", data);
-    toast.success("Note created successfully!");
-    if (onSuccess) {
-      onSuccess();
+  const handleSubmit = form.handleSubmit(async (data) => {
+    if (!user) {
+      toast.error("You must be logged in to create notes");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // First get the user's family_id
+      const { data: familyMember, error: familyError } = await supabase
+        .from('family_members')
+        .select('family_id')
+        .eq('profile_id', user.id)
+        .single();
+
+      if (familyError) throw familyError;
+
+      const { error } = await supabase.from('notes').insert({
+        title: data.title,
+        content: data.content,
+        is_checklist: isChecklist,
+        created_by: user.id,
+        family_id: familyMember.family_id
+      });
+
+      if (error) throw error;
+
+      toast.success("Note created successfully!");
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      console.error('Error creating note:', error);
+      toast.error("Failed to create note");
+    } finally {
+      setIsSubmitting(false);
     }
   });
 
@@ -58,7 +93,7 @@ export const NoteCreationForm = ({ onCancel, onSuccess }: NoteCreationFormProps)
           onChecklistChange={handleChecklistChange}
         />
       </div>
-      <NoteFormButtons onCancel={onCancel} />
+      <NoteFormButtons onCancel={onCancel} isSubmitting={isSubmitting} />
     </form>
   );
 };

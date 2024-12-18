@@ -9,6 +9,8 @@ import { EventFormDateTime } from "./form/EventFormDateTime";
 import { EventFormLocation } from "./form/EventFormLocation";
 import { EventFormActions } from "./form/EventFormActions";
 import { EventFormButtons } from "./form/EventFormButtons";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import type { z } from "zod";
 
 type EventFormValues = z.infer<typeof eventSchema>;
@@ -21,6 +23,8 @@ interface EventCreationFormProps {
 export const EventCreationForm = ({ onCancel, onSuccess }: EventCreationFormProps) => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -31,11 +35,44 @@ export const EventCreationForm = ({ onCancel, onSuccess }: EventCreationFormProp
     },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    console.log("Form data:", data);
-    toast.success("Event scheduled successfully!");
-    if (onSuccess) {
-      onSuccess();
+  const handleSubmit = form.handleSubmit(async (data) => {
+    if (!user) {
+      toast.error("You must be logged in to create events");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // First get the user's family_id
+      const { data: familyMember, error: familyError } = await supabase
+        .from('family_members')
+        .select('family_id')
+        .eq('profile_id', user.id)
+        .single();
+
+      if (familyError) throw familyError;
+
+      const { error } = await supabase.from('events').insert({
+        title: data.title,
+        description: data.description,
+        start_date: startDate?.toISOString(),
+        end_date: endDate?.toISOString(),
+        location: data.location,
+        created_by: user.id,
+        family_id: familyMember.family_id
+      });
+
+      if (error) throw error;
+
+      toast.success("Event scheduled successfully!");
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      console.error('Error creating event:', error);
+      toast.error("Failed to schedule event");
+    } finally {
+      setIsSubmitting(false);
     }
   });
 
@@ -69,7 +106,7 @@ export const EventCreationForm = ({ onCancel, onSuccess }: EventCreationFormProp
         />
         <EventFormActions />
       </div>
-      <EventFormButtons onCancel={onCancel} />
+      <EventFormButtons onCancel={onCancel} isSubmitting={isSubmitting} />
     </form>
   );
 };
