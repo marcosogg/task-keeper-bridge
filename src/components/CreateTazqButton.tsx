@@ -7,21 +7,31 @@ interface CreateTazqButtonProps {
   variant?: "default" | "outline" | "secondary";
   size?: "default" | "sm" | "lg";
   className?: string;
+  onClick?: () => void;
 }
 
 export const CreateTazqButton = ({ 
   variant = "default",
   size = "default",
-  className 
+  className,
+  onClick 
 }: CreateTazqButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      setIsModalOpen(true);
+    }
+  };
 
   return (
     <>
       <Button
         variant={variant}
         size={size}
-        onClick={() => setIsModalOpen(true)}
+        onClick={handleClick}
         className={className}
       >
         <Plus className="mr-2 h-4 w-4" />
