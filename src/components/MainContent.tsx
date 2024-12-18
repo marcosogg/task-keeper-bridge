@@ -1,8 +1,9 @@
-import { CalendarPlus, ListPlus, AlertOctagon, Star, Flag } from "lucide-react";
+import { CalendarPlus, ListPlus, AlertOctagon, Star, Flag, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InsightsPanel } from "./InsightsPanel";
 import { StatsPanel } from "./StatsPanel";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface ActivityItem {
   user: string;
@@ -66,33 +67,47 @@ const getPriorityColor = (priority: ActivityItem["priority"]) => {
 };
 
 export const MainContent = () => {
+  const handleQuickAction = (action: string) => {
+    // This is a placeholder for actual functionality
+    toast.success(`${action} action initiated`);
+  };
+
   return (
     <main className="flex-1 bg-gray-50 p-4 md:p-6" role="main" aria-label="Dashboard main content">
       <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
-        {/* Welcome Banner */}
+        {/* Welcome Banner with Quick Actions */}
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm animate-fadeIn" role="banner">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">Welcome back, Sarah!</h1>
               <p className="text-sm md:text-base text-gray-600 mt-1" role="status">Here's what's happening with your family today.</p>
             </div>
-            <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+            <div className="flex flex-wrap gap-3">
               <Button 
-                size="default"
-                className="w-full sm:w-auto bg-primary hover:bg-primary-dark text-white transition-colors"
+                onClick={() => handleQuickAction("Add Task")}
+                className="flex-1 md:flex-none bg-primary hover:bg-primary-dark text-white transition-colors"
                 aria-label="Add new task"
               >
                 <ListPlus className="mr-2 h-4 w-4" aria-hidden="true" />
                 Add Task
               </Button>
               <Button 
-                variant="outline" 
-                size="default"
-                className="w-full sm:w-auto border-primary text-primary hover:bg-primary/10 transition-colors"
+                onClick={() => handleQuickAction("Schedule Event")}
+                variant="outline"
+                className="flex-1 md:flex-none border-primary text-primary hover:bg-primary/10 transition-colors"
                 aria-label="Create new event"
               >
                 <CalendarPlus className="mr-2 h-4 w-4" aria-hidden="true" />
                 New Event
+              </Button>
+              <Button 
+                onClick={() => handleQuickAction("Send Message")}
+                variant="outline"
+                className="flex-1 md:flex-none border-primary text-primary hover:bg-primary/10 transition-colors"
+                aria-label="Send new message"
+              >
+                <MessageSquare className="mr-2 h-4 w-4" aria-hidden="true" />
+                Message
               </Button>
             </div>
           </div>
