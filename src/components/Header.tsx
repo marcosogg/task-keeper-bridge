@@ -36,7 +36,7 @@ export const Header = () => {
                 location.pathname === "/tasks" ? "text-primary" : ""
               }`}
             >
-              Tasks
+              TAZQ
             </Link>
             <Link
               to="/calendar"

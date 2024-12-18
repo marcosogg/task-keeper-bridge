@@ -54,7 +54,7 @@ export const Sidebar = () => {
           />
           <NavItem 
             icon={Calendar} 
-            label="Tasks" 
+            label="TAZQ" 
             href="/tasks"
           />
           <NavItem 
