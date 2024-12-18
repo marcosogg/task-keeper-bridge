@@ -9,6 +9,7 @@ interface CalendarWrapperProps {
   onDateSelect: (date: Date | undefined) => void;
   onMonthChange: (date: Date) => void;
   getDayTasks: (date: Date) => Task[];
+  view?: "month" | "week" | "day";
 }
 
 export const CalendarWrapper = ({
@@ -17,6 +18,7 @@ export const CalendarWrapper = ({
   onDateSelect,
   onMonthChange,
   getDayTasks,
+  view = "month",
 }: CalendarWrapperProps) => {
   const modifiers = {
     hasTask: (date: Date) => getDayTasks(date).length > 0,
@@ -44,9 +46,13 @@ export const CalendarWrapper = ({
             <CalendarDayContent
               date={date}
               tasks={getDayTasks(date)}
+              view={view}
             />
           ),
         }}
+        numberOfMonths={view === "month" ? 1 : undefined}
+        showWeekNumber={view === "week"}
+        showOutsideDays={view === "month"}
       />
     </div>
   );

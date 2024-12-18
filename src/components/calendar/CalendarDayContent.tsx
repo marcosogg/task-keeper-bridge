@@ -7,29 +7,58 @@ import type { Task } from "@/types/task";
 interface CalendarDayContentProps {
   date: Date;
   tasks: Task[];
+  view?: "month" | "week" | "day";
 }
 
-export const CalendarDayContent = ({ date, tasks }: CalendarDayContentProps) => {
+export const CalendarDayContent = ({ date, tasks, view = "month" }: CalendarDayContentProps) => {
+  const isDetailedView = view === "week" || view === "day";
+
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
         <div 
-          className="w-full h-full flex flex-col items-center justify-center"
+          className={cn(
+            "w-full h-full flex flex-col items-center justify-center",
+            isDetailedView && "min-h-[100px] py-2"
+          )}
           role="button"
           tabIndex={0}
         >
-          <span>{format(date, 'd')}</span>
+          <span className={cn(
+            "text-sm",
+            isDetailedView && "font-semibold mb-2"
+          )}>
+            {format(date, isDetailedView ? 'MMM d' : 'd')}
+          </span>
           {tasks.length > 0 && (
-            <div className="flex gap-1 mt-1">
-              {tasks.slice(0, 3).map((task) => (
-                <div
-                  key={task.id}
-                  className={cn(
-                    "w-1.5 h-1.5 rounded-full",
-                    getPriorityColor(task.priority)
-                  )}
-                  aria-hidden="true"
-                />
+            <div className={cn(
+              "flex gap-1 mt-1",
+              isDetailedView && "flex-col items-start w-full px-2"
+            )}>
+              {tasks.slice(0, isDetailedView ? undefined : 3).map((task) => (
+                isDetailedView ? (
+                  <div
+                    key={task.id}
+                    className="flex items-center gap-2 text-xs w-full truncate py-1 px-2 rounded bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div
+                      className={cn(
+                        "w-2 h-2 rounded-full",
+                        getPriorityColor(task.priority)
+                      )}
+                    />
+                    <span className="truncate">{task.title}</span>
+                  </div>
+                ) : (
+                  <div
+                    key={task.id}
+                    className={cn(
+                      "w-1.5 h-1.5 rounded-full",
+                      getPriorityColor(task.priority)
+                    )}
+                    aria-hidden="true"
+                  />
+                )
               ))}
             </div>
           )}
