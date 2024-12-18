@@ -1,43 +1,65 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { PriorityItem } from "@/types/common";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const usePriorityItems = () => {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ['priorityItems'],
+    queryKey: ['priorityItems', user?.id],
     queryFn: async () => {
-      const { data: tasks, error } = await supabase
+      if (!user) return [];
+
+      // First get the user's family_id using maybeSingle()
+      const { data: familyMember, error: familyError } = await supabase
+        .from('family_members')
+        .select('family_id')
+        .eq('profile_id', user.id)
+        .maybeSingle();
+
+      if (familyError) {
+        console.error('Error fetching family:', familyError);
+        return [];
+      }
+
+      if (!familyMember) {
+        return [];
+      }
+
+      // Then get the priority items for that family
+      const { data: tasks, error: tasksError } = await supabase
         .from('tasks')
         .select(`
           id,
           title,
-          due_date,
-          priority,
           status,
-          assigned_to:profiles!tasks_assigned_to_fkey (
+          priority,
+          due_date,
+          assigned_to,
+          profiles:assigned_to (
             full_name,
             email
           )
         `)
+        .eq('family_id', familyMember.family_id)
+        .in('status', ['todo', 'in_progress'])
         .order('due_date', { ascending: true })
         .limit(5);
 
-      if (error) {
-        console.error('Error fetching priority items:', error);
-        throw error;
+      if (tasksError) {
+        console.error('Error fetching tasks:', tasksError);
+        return [];
       }
 
       return tasks.map(task => ({
         id: task.id,
         title: task.title,
-        type: 'task',
-        dueDate: task.due_date,
+        status: task.status,
         priority: task.priority,
-        status: task.status === 'completed' ? 'completed' : 
-               new Date(task.due_date) < new Date() ? 'overdue' : 'pending',
-        assignedTo: task.assigned_to?.full_name || task.assigned_to?.email || 'Unassigned'
-      })) as PriorityItem[];
+        dueDate: task.due_date,
+        assignedTo: task.profiles?.full_name || task.profiles?.email || 'Unassigned'
+      }));
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!user,
   });
 };
