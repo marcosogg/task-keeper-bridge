@@ -17,21 +17,21 @@ const activities: ActivityItem[] = [
     user: "Mom", 
     action: "completed", 
     item: "Grocery Shopping",
-    priority: "high",
+    priority: "high" as const,
     timestamp: "2 hours ago"
   },
   { 
     user: "Dad", 
     action: "added", 
     item: "Family Dinner",
-    priority: "medium",
+    priority: "medium" as const,
     timestamp: "3 hours ago"
   },
   { 
     user: "John", 
     action: "updated", 
     item: "Weekend Plans",
-    priority: "low",
+    priority: "low" as const,
     timestamp: "4 hours ago"
   },
 ].sort((a, b) => {
@@ -39,7 +39,7 @@ const activities: ActivityItem[] = [
   return priorityOrder[a.priority] - priorityOrder[b.priority];
 });
 
-const getPriorityIcon = (priority: string) => {
+const getPriorityIcon = (priority: ActivityItem["priority"]) => {
   switch (priority) {
     case 'high':
       return <AlertOctagon className="h-4 w-4 text-red-500" aria-hidden="true" />;
@@ -52,7 +52,7 @@ const getPriorityIcon = (priority: string) => {
   }
 };
 
-const getPriorityColor = (priority: string) => {
+const getPriorityColor = (priority: ActivityItem["priority"]) => {
   switch (priority) {
     case 'high':
       return 'bg-red-50 border-red-100';
