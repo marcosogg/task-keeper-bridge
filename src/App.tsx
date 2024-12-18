@@ -8,6 +8,10 @@ import Tasks from "./pages/Tasks";
 import Messages from "./pages/Messages";
 import Calendar from "./pages/Calendar";
 import Family from "./pages/Family";
+import HelpCenter from "./pages/support/HelpCenter";
+import ContactSupport from "./pages/support/ContactSupport";
+import TermsOfService from "./pages/support/TermsOfService";
+import PrivacyPolicy from "./pages/support/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +27,10 @@ const App = () => (
           <Route path="/messages" element={<Messages />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/family" element={<Family />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/contact" element={<ContactSupport />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
