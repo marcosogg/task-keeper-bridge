@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFamilyStats } from "@/hooks/queries/useFamilyStats";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,11 +8,14 @@ import { EmptyFamilyState } from "./family/EmptyFamilyState";
 import { FamilyHeader } from "./family/FamilyHeader";
 import { FamilyMembersList } from "./family/FamilyMembersList";
 import { FamilyStatistics } from "./family/FamilyStatistics";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export const FamilyOverview = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const { data: familyMembers, isLoading } = useQuery({
+  const { data: familyMembers, isLoading, error } = useQuery({
     queryKey: ['familyMembers'],
     queryFn: async () => {
       if (!user) return null;
@@ -42,6 +45,38 @@ export const FamilyOverview = () => {
 
   const familyId = familyMembers?.[0]?.families?.id;
   const { memberStats, isLoading: isLoadingStats } = useFamilyStats(familyId);
+
+  // Set up real-time subscription for family members
+  useEffect(() => {
+    if (!user || !familyId) return;
+
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'family_members',
+          filter: `family_id=eq.${familyId}`
+        },
+        () => {
+          // Invalidate and refetch
+          void queryClient.invalidateQueries({ queryKey: ['familyMembers'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [user, familyId, queryClient]);
+
+  if (error) {
+    console.error('Error fetching family members:', error);
+    toast.error("Failed to load family overview");
+    return null;
+  }
 
   if (isLoading || isLoadingStats) {
     return <LoadingState />;
