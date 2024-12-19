@@ -52,8 +52,7 @@ export const TaskDetailsContainer = () => {
       } as Task;
     },
     enabled: !!taskId,
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retry: 1,
   });
 
   if (error) {
@@ -68,24 +67,12 @@ export const TaskDetailsContainer = () => {
     );
   }
 
-  if (isLoading) {
+  if (isLoading || !task) {
     return (
       <MainContent>
         <div className="p-6">
           <Card>
             <TaskDetailsSkeleton />
-          </Card>
-        </div>
-      </MainContent>
-    );
-  }
-
-  if (!task) {
-    return (
-      <MainContent>
-        <div className="p-6">
-          <Card>
-            <TaskDetailsError />
           </Card>
         </div>
       </MainContent>
