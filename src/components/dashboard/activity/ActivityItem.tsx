@@ -1,61 +1,30 @@
-import { AlertOctagon, Star, Flag } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { AlertOctagon, MessageSquare } from "lucide-react";
+import { format } from "date-fns";
 
 interface ActivityItemProps {
   type: string;
   date: string;
-  profileInitial: string;
   description: string;
 }
 
-export const ActivityItem = ({ type, date, profileInitial, description }: ActivityItemProps) => {
+export const ActivityItem = ({ type, date, description }: ActivityItemProps) => {
   return (
-    <div 
-      className={cn(
-        "flex items-center space-x-3 p-3 rounded-lg border transition-colors",
-        getPriorityColor(type)
-      )}
-      role="listitem"
-    >
-      <div 
-        className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-700 text-sm"
-        aria-hidden="true"
-      >
-        {profileInitial}
+    <div className="flex items-center space-x-4 p-4 rounded-lg border bg-white hover:bg-gray-50 transition-colors">
+      <div className="flex-shrink-0">
+        {type === 'task' ? (
+          <AlertOctagon className="h-5 w-5 text-blue-500" />
+        ) : (
+          <MessageSquare className="h-5 w-5 text-green-500" />
+        )}
       </div>
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          {getPriorityIcon(type)}
-          <p className="text-sm text-gray-900">
-            {description}
-          </p>
-        </div>
-        <p className="text-xs text-gray-500 mt-1">
-          {new Date(date).toLocaleString()}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900">
+          {description}
+        </p>
+        <p className="text-sm text-gray-500">
+          {format(new Date(date), 'MMM d, yyyy h:mm a')}
         </p>
       </div>
     </div>
   );
-};
-
-const getPriorityIcon = (type: string) => {
-  switch (type) {
-    case 'task':
-      return <AlertOctagon className="h-4 w-4 text-red-500" aria-hidden="true" />;
-    case 'message':
-      return <Star className="h-4 w-4 text-orange-500" aria-hidden="true" />;
-    default:
-      return <Flag className="h-4 w-4 text-blue-500" aria-hidden="true" />;
-  }
-};
-
-const getPriorityColor = (type: string) => {
-  switch (type) {
-    case 'task':
-      return 'bg-red-50 border-red-100';
-    case 'message':
-      return 'bg-orange-50 border-orange-100';
-    default:
-      return 'bg-blue-50 border-blue-100';
-  }
 };

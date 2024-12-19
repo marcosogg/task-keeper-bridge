@@ -1,24 +1,17 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ActivityList } from "./activity/ActivityList";
 import { LoadingState } from "./activity/LoadingState";
 import { EmptyState } from "./activity/EmptyState";
 
-interface ActivityItem {
-  activity_type: string;
-  activity_date: string;
-  profile_id: string;
-  description: string;
-  related_id: string;
-}
-
 export const RecentActivity = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const limit = 10; // Number of activities to fetch
+  const limit = 10;
 
   const { data: activities, isLoading, error } = useQuery({
     queryKey: ['family-activity', user?.id],
@@ -41,11 +34,12 @@ export const RecentActivity = () => {
         });
 
       if (activityError) throw activityError;
-      return data as ActivityItem[];
+      return data;
     },
     enabled: !!user
   });
 
+  // Set up real-time subscription for tasks and messages
   useEffect(() => {
     if (!user) return;
 
@@ -57,6 +51,17 @@ export const RecentActivity = () => {
           event: '*',
           schema: 'public',
           table: 'tasks'
+        },
+        () => {
+          void queryClient.invalidateQueries({ queryKey: ['family-activity'] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'messages'
         },
         () => {
           void queryClient.invalidateQueries({ queryKey: ['family-activity'] });
@@ -84,11 +89,13 @@ export const RecentActivity = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm" role="region" aria-label="Recent activity">
-      <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-4" id="recent-activity-heading">
-        Recent Activity
-      </h2>
-      <ActivityList activities={activities} />
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Recent Activity</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ActivityList activities={activities} />
+      </CardContent>
+    </Card>
   );
 };
