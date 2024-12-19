@@ -19,8 +19,8 @@ export interface ConversationMember {
   profile_id: string;
   created_at: string;
   profile?: {
+    id: string;
     full_name: string | null;
-    email: string | null;
     avatar_url: string | null;
   };
 }
@@ -32,9 +32,9 @@ export interface Message {
   content: string;
   created_at: string;
   updated_at: string;
-  sender?: {
+  sender: {
+    id: string;
     full_name: string | null;
-    email: string | null;
     avatar_url: string | null;
   };
 }
