@@ -13,7 +13,7 @@ import { DeleteTaskDialog } from "./DeleteTaskDialog";
 import type { Task } from "@/types/task";
 
 export const TaskDetailsContainer = () => {
-  const { taskId } = useParams();
+  const { taskId } = useParams<{ taskId: string }>();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -35,7 +35,10 @@ export const TaskDetailsContainer = () => {
         .eq('id', taskId)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching task:', error);
+        throw error;
+      }
       if (!data) throw new Error('Task not found');
       
       // Ensure the status is one of the allowed values
@@ -48,6 +51,7 @@ export const TaskDetailsContainer = () => {
         status: validStatus
       } as Task;
     },
+    enabled: !!taskId,
     retry: 3,
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -70,6 +74,18 @@ export const TaskDetailsContainer = () => {
         <div className="p-6">
           <Card>
             <TaskDetailsSkeleton />
+          </Card>
+        </div>
+      </MainContent>
+    );
+  }
+
+  if (!task) {
+    return (
+      <MainContent>
+        <div className="p-6">
+          <Card>
+            <TaskDetailsError />
           </Card>
         </div>
       </MainContent>
@@ -101,13 +117,11 @@ export const TaskDetailsContainer = () => {
         taskId={task.id}
       />
 
-      {task && (
-        <EditTaskModal
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          task={task}
-        />
-      )}
+      <EditTaskModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        task={task}
+      />
     </MainContent>
   );
 };
