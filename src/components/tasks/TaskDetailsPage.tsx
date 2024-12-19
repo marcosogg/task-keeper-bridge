@@ -20,6 +20,7 @@ import { TaskDetailsSkeleton } from "./details/TaskDetailsSkeleton";
 import { MainContent } from "../MainContent";
 import { useState } from "react";
 import { EditTaskModal } from "./EditTaskModal";
+import type { Task } from "@/types/task";
 
 export const TaskDetailsPage = () => {
   const { taskId } = useParams();
@@ -49,7 +50,15 @@ export const TaskDetailsPage = () => {
       if (error) throw error;
       if (!data) throw new Error('Task not found');
       
-      return data;
+      // Ensure the status is one of the allowed values
+      const validStatus = ['todo', 'in_progress', 'completed', 'cancelled'].includes(data.status)
+        ? (data.status as Task['status'])
+        : 'todo';
+
+      return {
+        ...data,
+        status: validStatus
+      } as Task;
     },
     retry: 3,
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
