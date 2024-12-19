@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
+import type { Message } from "@/types/conversation";
 
 export const useMessages = (conversationId: string | undefined) => {
   const queryClient = useQueryClient();
@@ -24,7 +25,7 @@ export const useMessages = (conversationId: string | undefined) => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      return data;
+      return data as Message[];
     },
     enabled: !!conversationId,
   });

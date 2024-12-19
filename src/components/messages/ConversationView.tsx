@@ -1,25 +1,11 @@
 import { useMessages } from "@/hooks/queries/useMessages";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ConversationHeader } from "./conversation/ConversationHeader";
 import { MessageList } from "./conversation/MessageList";
 import { MessageInput } from "./conversation/MessageInput";
-
-interface Conversation {
-  id: string;
-  name: string | null;
-  created_at: string;
-  created_by: string;
-  family_id: string;
-  conversation_members?: Array<{
-    profile: {
-      id: string;
-      full_name: string | null;
-      avatar_url: string | null;
-    };
-  }>;
-}
+import type { Conversation } from "@/types/conversation";
 
 interface ConversationViewProps {
   conversation?: Conversation;

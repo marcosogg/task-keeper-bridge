@@ -8,37 +8,48 @@ interface MessageInputProps {
 }
 
 export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
-  const [newMessage, setNewMessage] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
-    await onSendMessage(newMessage.trim());
-    setNewMessage("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim() || isSending) return;
+
+    setIsSending(true);
+    try {
+      await onSendMessage(message.trim());
+      setMessage("");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
   };
 
   return (
-    <div className="p-4 border-t">
+    <form onSubmit={handleSubmit} className="p-4 border-t">
       <div className="flex gap-2">
         <Textarea
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message..."
-          className="resize-none"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSendMessage();
-            }
-          }}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="Type a message..."
+          className="min-h-[2.5rem] max-h-[10rem]"
+          disabled={isSending}
         />
-        <Button
-          onClick={handleSendMessage}
-          disabled={!newMessage.trim()}
+        <Button 
+          type="submit" 
           size="icon"
+          disabled={!message.trim() || isSending}
         >
           <Send className="h-4 w-4" />
         </Button>
       </div>
-    </div>
+    </form>
   );
 };

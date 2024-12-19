@@ -1,14 +1,16 @@
 export interface Conversation {
   id: string;
-  name?: string;
+  name?: string | null;
   created_at: string;
   created_by: string;
   family_id: string;
-  creator?: {
-    full_name: string | null;
-    email: string | null;
-    avatar_url: string | null;
-  };
+  conversation_members?: Array<{
+    profile: {
+      id: string;
+      full_name: string | null;
+      avatar_url: string | null;
+    };
+  }>;
 }
 
 export interface ConversationMember {
