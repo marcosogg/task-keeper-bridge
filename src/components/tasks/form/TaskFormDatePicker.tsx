@@ -33,7 +33,9 @@ export const TaskFormDatePicker = ({ date, onDateChange }: TaskFormDatePickerPro
           <Calendar
             mode="single"
             selected={date}
-            onSelect={onDateChange}
+            onSelect={(newDate) => {
+              onDateChange(newDate || undefined);
+            }}
             initialFocus
           />
         </PopoverContent>

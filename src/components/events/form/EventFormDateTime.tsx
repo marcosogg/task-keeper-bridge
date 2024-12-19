@@ -35,6 +35,7 @@ export const EventFormDateTime = ({
                 !startDate && "text-muted-foreground",
                 error && "border-destructive"
               )}
+              type="button"
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {startDate ? format(startDate, "PPP") : "Select start date"}
@@ -44,7 +45,7 @@ export const EventFormDateTime = ({
             <Calendar
               mode="single"
               selected={startDate}
-              onSelect={onStartDateChange}
+              onSelect={(date) => onStartDateChange(date || undefined)}
               initialFocus
             />
           </PopoverContent>
@@ -64,6 +65,7 @@ export const EventFormDateTime = ({
                 "w-full mt-1.5 justify-start text-left font-normal",
                 !endDate && "text-muted-foreground"
               )}
+              type="button"
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {endDate ? format(endDate, "PPP") : "Select end date"}
@@ -73,7 +75,7 @@ export const EventFormDateTime = ({
             <Calendar
               mode="single"
               selected={endDate}
-              onSelect={onEndDateChange}
+              onSelect={(date) => onEndDateChange(date || undefined)}
               initialFocus
             />
           </PopoverContent>
