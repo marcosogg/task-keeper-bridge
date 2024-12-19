@@ -2,13 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, startOfWeek, endOfWeek } from "date-fns";
 import { TaskDialog } from "./TaskDialog";
 import { CalendarWrapper } from "./CalendarWrapper";
 import { CreateTazqButton } from "../CreateTazqButton";
 import { Calendar, List, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import type { Task } from "@/types/task";
 
 type CalendarView = "month" | "week" | "day";
@@ -21,7 +22,7 @@ export const CalendarContent = () => {
   const { user } = useAuth();
 
   const { data: tasks, isLoading } = useQuery({
-    queryKey: ['tasks', user?.id],
+    queryKey: ['tasks', user?.id, view, currentMonth],
     queryFn: async () => {
       if (!user) throw new Error("User not authenticated");
 
@@ -30,11 +31,19 @@ export const CalendarContent = () => {
         .from('family_members')
         .select('family_id')
         .eq('profile_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (familyError) throw familyError;
+      if (familyError) {
+        console.error('Error fetching family member:', familyError);
+        throw familyError;
+      }
 
-      const { data, error } = await supabase
+      if (!familyMember) {
+        console.error('No family member found');
+        return [];
+      }
+
+      let query = supabase
         .from('tasks')
         .select(`
           *,
@@ -45,9 +54,22 @@ export const CalendarContent = () => {
         `)
         .eq('family_id', familyMember.family_id);
 
-      if (error) throw error;
+      // Add date range filter based on view
+      if (view === "week") {
+        const start = startOfWeek(currentMonth);
+        const end = endOfWeek(currentMonth);
+        query = query
+          .gte('due_date', start.toISOString())
+          .lte('due_date', end.toISOString());
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching tasks:', error);
+        throw error;
+      }
       
-      // Ensure the data matches our Task type
       return (data as any[]).map(task => ({
         ...task,
         status: task.status as Task['status'],
