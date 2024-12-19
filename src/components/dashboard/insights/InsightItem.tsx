@@ -9,6 +9,7 @@ interface InsightItemProps {
   priority: string;
   dueDate: string;
   assignedTo: string;
+  onActionClick?: (id: string) => void;  // Added this prop
 }
 
 export const InsightItem = ({
@@ -18,8 +19,17 @@ export const InsightItem = ({
   priority,
   dueDate,
   assignedTo,
+  onActionClick,
 }: InsightItemProps) => {
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onActionClick) {
+      onActionClick(id);
+    } else {
+      navigate(`/tasks/${id}`);
+    }
+  };
 
   return (
     <div
@@ -47,7 +57,7 @@ export const InsightItem = ({
         size="sm" 
         variant={status === "overdue" ? "destructive" : "default"}
         className="min-w-[100px]"
-        onClick={() => navigate(`/tasks/${id}`)}
+        onClick={handleClick}
         aria-label={`View details for ${title}`}
       >
         View Details

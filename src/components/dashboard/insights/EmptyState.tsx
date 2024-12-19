@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface EmptyStateProps {
-  onManageFamily: () => void;
+  onManageFamily?: () => void;  // Made optional with ?
 }
 
 export const EmptyState = ({ onManageFamily }: EmptyStateProps) => {
@@ -18,9 +18,11 @@ export const EmptyState = ({ onManageFamily }: EmptyStateProps) => {
           <h3 className="font-medium text-gray-900">No Family Group</h3>
           <p className="text-sm text-gray-500 mt-1">Join or create a family group to see insights</p>
         </div>
-        <Button onClick={onManageFamily} className="mt-4">
-          Manage Family
-        </Button>
+        {onManageFamily && (
+          <Button onClick={onManageFamily} className="mt-4">
+            Manage Family
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

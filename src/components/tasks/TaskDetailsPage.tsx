@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { getPriorityColor } from "@/utils/styles";
 import { cn } from "@/lib/utils";
+import type { Priority } from "@/types/common";  // Import the Priority type
 
 export const TaskDetailsPage = () => {
   const { taskId } = useParams();
@@ -92,7 +93,7 @@ export const TaskDetailsPage = () => {
                 variant="outline"
                 className={cn(
                   "capitalize",
-                  getPriorityColor(task.priority)
+                  getPriorityColor(task.priority as Priority)
                 )}
               >
                 {task.priority}
