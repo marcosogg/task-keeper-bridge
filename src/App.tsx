@@ -20,6 +20,7 @@ import HelpCenter from "./pages/support/HelpCenter";
 import ContactSupport from "./pages/support/ContactSupport";
 import TermsOfService from "./pages/support/TermsOfService";
 import PrivacyPolicy from "./pages/support/PrivacyPolicy";
+import { TaskDetailsPage } from "./components/tasks/TaskDetailsPage";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -64,6 +65,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Tasks />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/tasks/:taskId"
+                    element={
+                      <ProtectedRoute>
+                        <TaskDetailsPage />
                       </ProtectedRoute>
                     }
                   />

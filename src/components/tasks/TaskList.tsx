@@ -1,12 +1,14 @@
-import { Clock, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
+import { Clock, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTasks } from "@/hooks/queries/useTasks";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 export const TaskList = () => {
   const { data: tasks, isLoading, error } = useTasks();
+  const navigate = useNavigate();
 
   if (error) {
     toast.error("Failed to load tasks");
@@ -81,7 +83,11 @@ export const TaskList = () => {
                task.status === "in_progress" ? "In Progress" : 
                "Completed"}
             </div>
-            <Button size="sm" variant="outline">
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => navigate(`/tasks/${task.id}`)}
+            >
               View Details
             </Button>
           </div>
