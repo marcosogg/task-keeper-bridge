@@ -1,6 +1,6 @@
 import { AlertOctagon, Star, Flag, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
@@ -16,6 +16,7 @@ interface ActivityItem {
 
 export const RecentActivity = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const limit = 10; // Number of activities to fetch
 
   const { data: activities, isLoading, error } = useQuery({
@@ -68,35 +69,13 @@ export const RecentActivity = () => {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, queryClient]);
 
   if (error) {
     console.error('Error fetching activity:', error);
     toast.error("Failed to load recent activity");
     return null;
   }
-
-  const getPriorityIcon = (type: string) => {
-    switch (type) {
-      case 'task':
-        return <AlertOctagon className="h-4 w-4 text-red-500" aria-hidden="true" />;
-      case 'message':
-        return <Star className="h-4 w-4 text-orange-500" aria-hidden="true" />;
-      default:
-        return <Flag className="h-4 w-4 text-blue-500" aria-hidden="true" />;
-    }
-  };
-
-  const getPriorityColor = (type: string) => {
-    switch (type) {
-      case 'task':
-        return 'bg-red-50 border-red-100';
-      case 'message':
-        return 'bg-orange-50 border-orange-100';
-      default:
-        return 'bg-blue-50 border-blue-100';
-    }
-  };
 
   if (isLoading) {
     return (
@@ -161,4 +140,26 @@ export const RecentActivity = () => {
       </div>
     </div>
   );
+};
+
+const getPriorityIcon = (type: string) => {
+  switch (type) {
+    case 'task':
+      return <AlertOctagon className="h-4 w-4 text-red-500" aria-hidden="true" />;
+    case 'message':
+      return <Star className="h-4 w-4 text-orange-500" aria-hidden="true" />;
+    default:
+      return <Flag className="h-4 w-4 text-blue-500" aria-hidden="true" />;
+  }
+};
+
+const getPriorityColor = (type: string) => {
+  switch (type) {
+    case 'task':
+      return 'bg-red-50 border-red-100';
+    case 'message':
+      return 'bg-orange-50 border-orange-100';
+    default:
+      return 'bg-blue-50 border-blue-100';
+  }
 };
