@@ -1,3 +1,4 @@
+import React from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,10 +8,10 @@ interface NotificationBellProps {
   isLoading?: boolean;
 }
 
-export const NotificationBell = ({ unreadCount, isLoading }: NotificationBellProps) => {
+export const NotificationBell = React.forwardRef<HTMLButtonElement, NotificationBellProps>(({ unreadCount, isLoading }, ref) => {
   if (isLoading) {
     return (
-      <Button variant="ghost" size="icon" className="relative" disabled>
+      <Button variant="ghost" size="icon" className="relative" disabled ref={ref}>
         <Bell className="h-5 w-5 text-gray-400" />
         <Skeleton className="absolute -top-1 -right-1 h-4 w-4 rounded-full" />
       </Button>
@@ -23,6 +24,7 @@ export const NotificationBell = ({ unreadCount, isLoading }: NotificationBellPro
       size="icon" 
       className="relative"
       aria-label={`Notifications - ${unreadCount} unread`}
+      ref={ref}
     >
       <Bell className="h-5 w-5 text-gray-600" />
       {unreadCount > 0 && (
@@ -32,4 +34,6 @@ export const NotificationBell = ({ unreadCount, isLoading }: NotificationBellPro
       )}
     </Button>
   );
-};
+});
+
+NotificationBell.displayName = "NotificationBell";
