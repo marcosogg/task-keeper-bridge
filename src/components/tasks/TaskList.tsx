@@ -68,9 +68,9 @@ export const TaskList = () => {
             <div>
               <p className="font-medium text-gray-900">{task.title}</p>
               <div className="flex items-center space-x-2 text-sm text-gray-500">
-                <span>Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}</span>
+                <span>Due: {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date'}</span>
                 <span>•</span>
-                <span>Assigned to: {task.assignedTo?.join(', ') || 'Unassigned'}</span>
+                <span>Assigned to: {task.assigned_to_profile?.full_name || 'Unassigned'}</span>
               </div>
             </div>
           </div>

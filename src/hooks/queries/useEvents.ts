@@ -9,7 +9,7 @@ export const useEvents = (familyId: string) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
     select: (data: Event[]) => {
       return data.sort((a, b) => 
-        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
       );
     },
   });
