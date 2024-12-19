@@ -7,6 +7,26 @@ interface FamilyMemberStats {
   overdue_tasks: number;
 }
 
+interface StatCardProps {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  bgColor: string;
+  textColor: string;
+  borderColor: string;
+  iconColor: string;
+}
+
+const StatCard = ({ icon, label, value, bgColor, textColor, borderColor, iconColor }: StatCardProps) => (
+  <div className={`flex items-center gap-2 p-3 rounded-lg ${bgColor} ${borderColor}`}>
+    <div className={iconColor}>{icon}</div>
+    <div>
+      <p className="text-sm font-medium">{label}</p>
+      <p className={`text-2xl font-bold ${textColor}`}>{value}</p>
+    </div>
+  </div>
+);
+
 interface FamilyStatisticsProps {
   memberStats?: FamilyMemberStats[];
 }
@@ -18,28 +38,34 @@ export const FamilyStatistics = ({ memberStats }: FamilyStatisticsProps) => {
   const totalOverdue = memberStats?.reduce((acc, curr) => acc + Number(curr.overdue_tasks), 0) || 0;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-100">
-        <CheckCircle2 className="h-5 w-5 text-green-500" />
-        <div>
-          <p className="text-sm font-medium">Completed Tasks</p>
-          <p className="text-2xl font-bold text-green-600">{totalCompleted}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-50 border border-yellow-100">
-        <Clock className="h-5 w-5 text-yellow-500" />
-        <div>
-          <p className="text-sm font-medium">Active Tasks</p>
-          <p className="text-2xl font-bold text-yellow-600">{totalActive}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-100">
-        <AlertTriangle className="h-5 w-5 text-red-500" />
-        <div>
-          <p className="text-sm font-medium">Overdue Tasks</p>
-          <p className="text-2xl font-bold text-red-600">{totalOverdue}</p>
-        </div>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4" role="group" aria-label="Family task statistics">
+      <StatCard
+        icon={<CheckCircle2 className="h-5 w-5" />}
+        label="Completed Tasks"
+        value={totalCompleted}
+        bgColor="bg-green-50"
+        textColor="text-green-600"
+        borderColor="border border-green-100"
+        iconColor="text-green-500"
+      />
+      <StatCard
+        icon={<Clock className="h-5 w-5" />}
+        label="Active Tasks"
+        value={totalActive}
+        bgColor="bg-yellow-50"
+        textColor="text-yellow-600"
+        borderColor="border border-yellow-100"
+        iconColor="text-yellow-500"
+      />
+      <StatCard
+        icon={<AlertTriangle className="h-5 w-5" />}
+        label="Overdue Tasks"
+        value={totalOverdue}
+        bgColor="bg-red-50"
+        textColor="text-red-600"
+        borderColor="border border-red-100"
+        iconColor="text-red-500"
+      />
     </div>
   );
 };

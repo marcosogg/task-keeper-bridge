@@ -12,11 +12,16 @@ export const FamilyHeader = ({ familyName }: FamilyHeaderProps) => {
   
   return (
     <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-xl font-bold">
+      <CardTitle className="text-xl font-bold" role="heading" aria-level={2}>
         {familyName}
       </CardTitle>
-      <Button variant="outline" size="sm" onClick={() => navigate('/family')}>
-        <Users className="mr-2 h-4 w-4" />
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={() => navigate('/family')}
+        aria-label="Manage family members"
+      >
+        <Users className="mr-2 h-4 w-4" aria-hidden="true" />
         Manage Family
       </Button>
     </div>
