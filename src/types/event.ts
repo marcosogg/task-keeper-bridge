@@ -1,18 +1,17 @@
-import { BaseEntity } from './common';
-
-export interface Event extends BaseEntity {
+export interface Event {
+  id: string;
   title: string;
   description?: string;
-  startDate: string;
-  endDate?: string;
+  start_date: string;
+  end_date?: string;
   location?: string;
-  familyId: string;
-  createdBy: string;
-  attendees?: string[];
-  isRecurring?: boolean;
-  recurrencePattern?: string;
-  reminder?: boolean;
-  reminderTime?: string;
+  created_by: string;
+  family_id: string;
+  created_at: string;
+  updated_at: string;
+  creator?: {
+    full_name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  };
 }
-
-export type EventFormData = Omit<Event, keyof BaseEntity | 'familyId' | 'createdBy'>;

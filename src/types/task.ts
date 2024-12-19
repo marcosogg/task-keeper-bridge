@@ -4,16 +4,17 @@ export interface Task {
   description?: string;
   status: 'todo' | 'in_progress' | 'completed';
   priority: 'low' | 'medium' | 'high';
-  dueDate?: string;
-  assignedTo?: string[];
-  createdBy: string;
-  familyId: string;
-  createdAt: string;
-  updatedAt: string;
-  completedAt?: string;
-  assigned_to?: {
+  due_date?: string;
+  assigned_to?: string; // Changed from string[] to string to match DB schema
+  created_by: string;
+  family_id: string;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+  assigned_to_profile?: {
     full_name: string | null;
     email: string | null;
+    avatar_url: string | null;
   };
 }
 

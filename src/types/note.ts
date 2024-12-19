@@ -1,20 +1,15 @@
-import { BaseEntity, Taggable } from './common';
-
-export interface Note extends BaseEntity, Taggable {
+export interface Note {
+  id: string;
   title?: string;
   content: string;
-  isChecklist: boolean;
-  checklistItems?: ChecklistItem[];
-  familyId: string;
-  createdBy: string;
-  pinned?: boolean;
+  is_checklist: boolean;
+  created_by: string;
+  family_id: string;
+  created_at: string;
+  updated_at: string;
+  creator?: {
+    full_name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  };
 }
-
-export interface ChecklistItem {
-  id: string;
-  content: string;
-  completed: boolean;
-  order: number;
-}
-
-export type NoteFormData = Omit<Note, keyof BaseEntity | 'familyId' | 'createdBy'>;

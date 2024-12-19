@@ -1,17 +1,26 @@
 export interface Family {
   id: string;
   name: string;
-  description?: string;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-  members: FamilyMember[];
+  created_at: string;
+  created_by: string;
+  creator?: {
+    full_name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  };
 }
 
 export interface FamilyMember {
-  userId: string;
-  familyId: string;
+  id: string;
+  family_id: string;
+  profile_id: string;
   role: 'admin' | 'member';
-  joinedAt: string;
-  status: 'active' | 'invited' | 'inactive';
+  status: 'pending' | 'active' | 'inactive';
+  joined_at?: string;
+  created_at: string;
+  profile?: {
+    full_name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  };
 }
