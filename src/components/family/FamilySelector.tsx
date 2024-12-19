@@ -2,13 +2,6 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@/components/ui/command';
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -35,29 +28,23 @@ export function FamilySelector() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder="Search family..." />
-          <CommandEmpty>No family found.</CommandEmpty>
-          <CommandGroup>
-            {isLoading ? (
-              <CommandItem disabled>Loading families...</CommandItem>
-            ) : (
-              (userFamilies ?? [])
-                .filter((family): family is Family => 
-                  family !== null && 
-                  family !== undefined && 
-                  typeof family.name === 'string' && 
-                  family.name.length > 0
-                )
-                .map((family) => (
-                  <CommandItem
-                    key={family.id}
-                    value={family.id.toString()}
-                    onSelect={() => {
-                      setCurrentFamily(family);
-                      setOpen(false);
-                    }}
-                  >
+        {isLoading ? (
+          <div className="p-2">Loading families...</div>
+        ) : userFamilies && userFamilies.length > 0 ? (
+          <ul className="p-2">
+            {userFamilies.map((family) => (
+              <li key={family.id}>
+                <button
+                  onClick={() => {
+                    setCurrentFamily(family);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "w-full p-2 text-left hover:bg-gray-100",
+                    currentFamily?.id === family.id && "bg-gray-100"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
                     <Check
                       className={cn(
                         "mr-2 h-4 w-4",
@@ -65,11 +52,14 @@ export function FamilySelector() {
                       )}
                     />
                     {family.name}
-                  </CommandItem>
-                ))
-            )}
-          </CommandGroup>
-        </Command>
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="p-2">No families found.</div>
+        )}
       </PopoverContent>
     </Popover>
   );
