@@ -1,6 +1,8 @@
 import { Calendar, Home, MessageSquare, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "react-router-dom";
+import { useQuickStats } from "@/hooks/queries/useQuickStats";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface NavItemProps {
   icon: React.ElementType;
@@ -27,6 +29,8 @@ const NavItem = ({ icon: Icon, label, href }: NavItemProps) => {
 };
 
 export const Sidebar = () => {
+  const { data: stats, isLoading } = useQuickStats();
+
   return (
     <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 p-6">
       <div className="space-y-6">
@@ -74,14 +78,29 @@ export const Sidebar = () => {
             Quick Stats
           </h3>
           <div className="space-y-3">
-            <div className="bg-gray-50 p-3 rounded-lg transition-colors hover:bg-gray-100">
-              <div className="text-sm text-gray-600">Active Tasks</div>
-              <div className="text-2xl font-semibold text-primary-dark">12</div>
-            </div>
-            <div className="bg-gray-50 p-3 rounded-lg transition-colors hover:bg-gray-100">
-              <div className="text-sm text-gray-600">Upcoming Events</div>
-              <div className="text-2xl font-semibold text-primary-dark">3</div>
-            </div>
+            {isLoading ? (
+              <>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="text-sm text-gray-600">Active Tasks</div>
+                  <Skeleton className="h-8 w-16 mt-1" />
+                </div>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="text-sm text-gray-600">Upcoming Events</div>
+                  <Skeleton className="h-8 w-16 mt-1" />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bg-gray-50 p-3 rounded-lg transition-colors hover:bg-gray-100">
+                  <div className="text-sm text-gray-600">Active Tasks</div>
+                  <div className="text-2xl font-semibold text-primary-dark">{stats?.activeTasks || 0}</div>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-lg transition-colors hover:bg-gray-100">
+                  <div className="text-sm text-gray-600">Upcoming Events</div>
+                  <div className="text-2xl font-semibold text-primary-dark">{stats?.upcomingEvents || 0}</div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
