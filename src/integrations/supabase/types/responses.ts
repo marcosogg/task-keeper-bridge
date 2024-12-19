@@ -1,4 +1,4 @@
-import type { Database } from './index';
+import type { Database } from './schema';
 
 export type TaskResponse = Database['public']['Tables']['tasks']['Row'] & {
   assigned_to_profile?: {
