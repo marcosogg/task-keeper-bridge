@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Calendar, FileText, ListCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -29,6 +29,9 @@ export const CreateTazqModal = ({ open, onOpenChange }: CreateTazqModalProps) =>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-center text-xl">Create New Task</DialogTitle>
+            <DialogDescription>
+              Create and configure a new task for your family
+            </DialogDescription>
           </DialogHeader>
           <TaskCreationForm onCancel={handleClose} onSuccess={handleClose} />
         </DialogContent>
@@ -42,6 +45,9 @@ export const CreateTazqModal = ({ open, onOpenChange }: CreateTazqModalProps) =>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-center text-xl">Schedule New Event</DialogTitle>
+            <DialogDescription>
+              Schedule and configure a new event for your family
+            </DialogDescription>
           </DialogHeader>
           <EventCreationForm onCancel={handleClose} onSuccess={handleClose} />
         </DialogContent>
@@ -55,6 +61,9 @@ export const CreateTazqModal = ({ open, onOpenChange }: CreateTazqModalProps) =>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-center text-xl">Create New Note</DialogTitle>
+            <DialogDescription>
+              Create and save a new note for your family
+            </DialogDescription>
           </DialogHeader>
           <NoteCreationForm onCancel={handleClose} onSuccess={handleClose} />
         </DialogContent>
@@ -67,6 +76,9 @@ export const CreateTazqModal = ({ open, onOpenChange }: CreateTazqModalProps) =>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-xl">Create New TAZQ</DialogTitle>
+          <DialogDescription>
+            Choose the type of item you want to create for your family
+          </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-1 gap-4 py-4">
           <Button
