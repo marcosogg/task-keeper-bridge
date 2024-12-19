@@ -9,7 +9,11 @@ const Index = () => {
       <Header />
       <div className="flex flex-1">
         <Sidebar />
-        <MainContent />
+        <MainContent>
+          <div className="p-6">
+            <h1>Welcome to your dashboard</h1>
+          </div>
+        </MainContent>
       </div>
       <Footer />
     </div>
