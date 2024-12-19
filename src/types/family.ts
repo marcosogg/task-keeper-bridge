@@ -14,7 +14,7 @@ export interface FamilyMember {
   id: string;
   family_id: string;
   profile_id: string;
-  role: 'admin' | 'member';
+  role: string; // Changed from 'admin' | 'member' to string to match Supabase
   status: 'pending' | 'active' | 'inactive';
   joined_at?: string;
   created_at: string;
@@ -22,5 +22,9 @@ export interface FamilyMember {
     full_name: string | null;
     email: string | null;
     avatar_url: string | null;
+  };
+  families?: {
+    name: string;
+    id: string;
   };
 }

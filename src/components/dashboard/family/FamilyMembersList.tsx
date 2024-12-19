@@ -2,14 +2,6 @@ import { FamilyMember } from "@/types/family";
 import { FamilyMemberAvatar } from "./FamilyMemberAvatar";
 import { FamilyMemberTooltip } from "./FamilyMemberTooltip";
 
-interface FamilyMemberWithProfile extends FamilyMember {
-  profiles?: {
-    full_name: string | null;
-    email: string | null;
-    avatar_url: string | null;
-  };
-}
-
 interface FamilyMemberStats {
   profile_id: string;
   total_tasks: number;
@@ -18,7 +10,7 @@ interface FamilyMemberStats {
 }
 
 interface FamilyMembersListProps {
-  members: FamilyMemberWithProfile[];
+  members: FamilyMember[];
   memberStats?: FamilyMemberStats[];
 }
 
