@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import type { Task } from "@/types/task";
+import type { TaskResponse } from "@/integrations/supabase/types";
 
 export const useTasks = () => {
   const { user } = useAuth();
@@ -11,7 +11,6 @@ export const useTasks = () => {
     queryFn: async () => {
       if (!user) throw new Error("User not authenticated");
 
-      // First get the user's family_id
       const { data: familyMember, error: familyError } = await supabase
         .from('family_members')
         .select('family_id')
@@ -45,7 +44,7 @@ export const useTasks = () => {
         throw error;
       }
 
-      return data as Task[];
+      return data as TaskResponse[];
     },
     enabled: !!user,
   });
