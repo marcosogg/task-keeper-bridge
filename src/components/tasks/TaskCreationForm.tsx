@@ -46,7 +46,6 @@ export const TaskCreationForm = ({ onCancel, onSuccess }: TaskCreationFormProps)
 
     setIsSubmitting(true);
     try {
-      // First get the user's family_id using maybeSingle()
       const { data: familyMember, error: familyError } = await supabase
         .from('family_members')
         .select('family_id')
@@ -63,12 +62,15 @@ export const TaskCreationForm = ({ onCancel, onSuccess }: TaskCreationFormProps)
         return;
       }
 
+      // Format the date to ISO string only if it exists
+      const formattedDate = date ? new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString() : null;
+
       const { error } = await supabase.from('tasks').insert({
         title: data.title,
         description: data.description,
         priority: data.priority,
         status: data.status,
-        due_date: date?.toISOString(),
+        due_date: formattedDate,
         created_by: user.id,
         family_id: familyMember.family_id
       });

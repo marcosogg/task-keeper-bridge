@@ -34,7 +34,14 @@ export const TaskFormDatePicker = ({ date, onDateChange }: TaskFormDatePickerPro
             mode="single"
             selected={date}
             onSelect={(newDate) => {
-              onDateChange(newDate || undefined);
+              if (newDate) {
+                // Set time to end of day (23:59:59) for due dates
+                const endOfDay = new Date(newDate);
+                endOfDay.setHours(23, 59, 59, 999);
+                onDateChange(endOfDay);
+              } else {
+                onDateChange(undefined);
+              }
             }}
             initialFocus
           />
