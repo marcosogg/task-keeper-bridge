@@ -14,11 +14,11 @@ export interface FamilyMember {
   id: string;
   family_id: string;
   profile_id: string;
-  role: string; // Changed from 'admin' | 'member' to string to match Supabase
-  status: 'pending' | 'active' | 'inactive';
+  role: string;
+  status: string;
   joined_at?: string;
   created_at: string;
-  profile?: {
+  profiles?: {
     full_name: string | null;
     email: string | null;
     avatar_url: string | null;
