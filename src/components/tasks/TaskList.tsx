@@ -1,14 +1,19 @@
-import { Clock, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Clock, AlertTriangle, CheckCircle2, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTasks } from "@/hooks/queries/useTasks";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { ViewTaskModal } from "./ViewTaskModal";
+import { EditTaskModal } from "./EditTaskModal";
+import { DeleteTaskDialog } from "./details/DeleteTaskDialog";
 
 export const TaskList = () => {
   const { data: tasks, isLoading, error } = useTasks();
-  const navigate = useNavigate();
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [editTaskId, setEditTaskId] = useState<string | null>(null);
+  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
 
   if (error) {
     toast.error("Failed to load tasks");
@@ -52,7 +57,7 @@ export const TaskList = () => {
     );
   }
 
-  return (
+  const taskList = (
     <div className="space-y-4" role="list">
       {tasks.map((task) => (
         <div
@@ -83,16 +88,69 @@ export const TaskList = () => {
                task.status === "in_progress" ? "In Progress" : 
                "Completed"}
             </div>
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={() => navigate(`/tasks/${task.id}`)}
-            >
-              View Details
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button 
+                size="icon" 
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditTaskId(task.id);
+                }}
+              >
+                <Pencil className="h-4 w-4" />
+                <span className="sr-only">Edit task</span>
+              </Button>
+              <Button 
+                size="icon" 
+                variant="ghost"
+                className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteTaskId(task.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Delete task</span>
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => setSelectedTaskId(task.id)}
+              >
+                View Details
+              </Button>
+            </div>
           </div>
         </div>
       ))}
     </div>
+  );
+
+  return (
+    <>
+      {taskList}
+      {selectedTaskId && (
+        <ViewTaskModal
+          open={!!selectedTaskId}
+          onOpenChange={(open) => !open && setSelectedTaskId(null)}
+          taskId={selectedTaskId}
+        />
+      )}
+      {editTaskId && (
+        <EditTaskModal
+          open={!!editTaskId}
+          onOpenChange={(open) => !open && setEditTaskId(null)}
+          task={tasks?.find(t => t.id === editTaskId)}
+        />
+      )}
+      {deleteTaskId && (
+        <DeleteTaskDialog
+          open={!!deleteTaskId}
+          onOpenChange={(open) => !open && setDeleteTaskId(null)}
+          taskId={deleteTaskId}
+        />
+      )}
+    </>
   );
 };

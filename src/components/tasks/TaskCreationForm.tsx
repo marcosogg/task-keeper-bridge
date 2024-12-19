@@ -39,12 +39,14 @@ export const TaskCreationForm = ({
       priority: initialData.priority,
       dueDate: initialData.due_date,
       assignedTo: initialData.assigned_to ? [initialData.assigned_to] : [],
+      status: initialData.status,
     } : {
       title: "",
       description: "",
       priority: "medium",
       dueDate: "",
       assignedTo: [],
+      status: "todo",
     }
   });
 
@@ -70,6 +72,7 @@ export const TaskCreationForm = ({
         assigned_to: data.assignedTo?.[0],
         family_id: familyMember.family_id,
         created_by: user.id,
+        status: data.status,
       };
 
       if (editMode && initialData) {
@@ -87,7 +90,7 @@ export const TaskCreationForm = ({
     },
     onSuccess: () => {
       toast.success(editMode ? "Task updated successfully" : "Task created successfully");
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] });
       if (editMode) {
         queryClient.invalidateQueries({ queryKey: ['task', initialData?.id] });
       }
@@ -101,7 +104,15 @@ export const TaskCreationForm = ({
   });
 
   const onSubmit = form.handleSubmit((data) => {
+    console.log('Form data being submitted:', data);
     mutation.mutate(data);
+  });
+
+  console.log('Form state:', {
+    isSubmitting: form.formState.isSubmitting,
+    errors: form.formState.errors,
+    isDirty: form.formState.isDirty,
+    isValid: form.formState.isValid
   });
 
   return (
@@ -114,7 +125,8 @@ export const TaskCreationForm = ({
       />
       <TaskFormDatePicker
         date={form.watch("dueDate") ? new Date(form.watch("dueDate")) : undefined}
-        onDateChange={(date) => form.setValue("dueDate", date?.toISOString())}
+        onDateChange={(date) => form.setValue("dueDate", date?.toISOString() || "")}
+        error={form.formState.errors.dueDate}
       />
       <TaskFormActions
         assignees={form.watch("assignedTo")}

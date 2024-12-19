@@ -9,19 +9,21 @@ import { cn } from "@/lib/utils";
 interface TaskFormDatePickerProps {
   date: Date | undefined;
   onDateChange: (date: Date | undefined) => void;
+  error?: { message?: string };
 }
 
-export const TaskFormDatePicker = ({ date, onDateChange }: TaskFormDatePickerProps) => {
+export const TaskFormDatePicker = ({ date, onDateChange, error }: TaskFormDatePickerProps) => {
   return (
     <div>
-      <Label>Due Date (Optional)</Label>
+      <Label>Due Date</Label>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             className={cn(
               "w-full mt-1.5 justify-start text-left font-normal",
-              !date && "text-muted-foreground"
+              !date && "text-muted-foreground",
+              error && "border-destructive"
             )}
             type="button"
           >
@@ -47,6 +49,9 @@ export const TaskFormDatePicker = ({ date, onDateChange }: TaskFormDatePickerPro
           />
         </PopoverContent>
       </Popover>
+      {error && (
+        <p className="text-sm font-medium text-destructive mt-1">{error.message}</p>
+      )}
     </div>
   );
 };

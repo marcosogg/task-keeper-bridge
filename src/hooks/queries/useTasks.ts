@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import type { Task } from "@/types/task";
 import type { TaskResponse } from "@/integrations/supabase/types/responses";
 
 export const useTasks = () => {
@@ -44,7 +45,17 @@ export const useTasks = () => {
         throw error;
       }
 
-      return data as TaskResponse[];
+      // Transform the response data to ensure status is valid
+      return (data as TaskResponse[]).map(task => {
+        const validStatus = ['todo', 'in_progress', 'completed', 'cancelled'].includes(task.status)
+          ? (task.status as Task['status'])
+          : 'todo';
+
+        return {
+          ...task,
+          status: validStatus
+        } as Task;
+      });
     },
     enabled: !!user,
   });
