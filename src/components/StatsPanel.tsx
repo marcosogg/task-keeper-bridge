@@ -5,18 +5,46 @@ import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { TaskDialog } from "./calendar/TaskDialog";
 import { CalendarWrapper } from "./calendar/CalendarWrapper";
-import { fetchTasks } from "@/utils/mockData";
 import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import type { Task } from "@/types/task";
 
 export const StatsPanel = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const { user } = useAuth();
 
   const { data: tasks, isLoading } = useQuery({
-    queryKey: ['tasks'],
-    queryFn: fetchTasks,
+    queryKey: ['tasks', user?.id],
+    queryFn: async () => {
+      if (!user) throw new Error("User not authenticated");
+
+      // First get the user's family_id
+      const { data: familyMember, error: familyError } = await supabase
+        .from('family_members')
+        .select('family_id')
+        .eq('profile_id', user.id)
+        .single();
+
+      if (familyError) throw familyError;
+
+      const { data, error } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          assigned_to:profiles!tasks_assigned_to_fkey (
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('family_id', familyMember.family_id);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user
   });
 
   const getDayTasks = (date: Date) => {
