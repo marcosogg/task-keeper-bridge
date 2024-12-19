@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AppError } from '@/lib/error-handling';
 
 interface Props {
   children: ReactNode;
@@ -26,6 +27,16 @@ export class ErrorBoundary extends Component<Props, State> {
     console.error('Uncaught error:', error, errorInfo);
   }
 
+  private getErrorMessage(error: Error | null): string {
+    if (!error) return 'An unexpected error occurred';
+    
+    if (error instanceof AppError) {
+      return error.message;
+    }
+
+    return error.message || 'An unexpected error occurred';
+  }
+
   private handleReset = () => {
     this.setState({ hasError: false, error: null });
     window.location.reload();
@@ -40,7 +51,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <AlertTitle>Something went wrong</AlertTitle>
             <AlertDescription className="mt-2">
               <p className="text-sm mb-4">
-                {this.state.error?.message || 'An unexpected error occurred'}
+                {this.getErrorMessage(this.state.error)}
               </p>
               <Button onClick={this.handleReset} variant="outline" size="sm">
                 Try again

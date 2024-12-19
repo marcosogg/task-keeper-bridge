@@ -3,7 +3,7 @@ import { startOfWeek, endOfWeek } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Task } from "@/types/task";
-import { toast } from "sonner";
+import { AppError } from "@/lib/error-handling";
 
 export const useCalendarTasks = (view: "month" | "week" | "day", currentMonth: Date) => {
   const { user } = useAuth();
@@ -11,7 +11,7 @@ export const useCalendarTasks = (view: "month" | "week" | "day", currentMonth: D
   return useQuery({
     queryKey: ['tasks', user?.id, view, currentMonth],
     queryFn: async () => {
-      if (!user) throw new Error("User not authenticated");
+      if (!user) throw new AppError("User not authenticated");
 
       try {
         const { data: familyMember, error: familyError } = await supabase
@@ -21,8 +21,7 @@ export const useCalendarTasks = (view: "month" | "week" | "day", currentMonth: D
           .maybeSingle();
 
         if (familyError) {
-          console.error('Error fetching family member:', familyError);
-          throw familyError;
+          throw new AppError('Error fetching family member', 'FAMILY_ERROR', familyError);
         }
 
         if (!familyMember) {
@@ -52,8 +51,7 @@ export const useCalendarTasks = (view: "month" | "week" | "day", currentMonth: D
         const { data, error } = await query;
 
         if (error) {
-          console.error('Error fetching tasks:', error);
-          throw error;
+          throw new AppError('Error fetching tasks', 'TASKS_ERROR', error);
         }
         
         return (data as any[]).map(task => ({
@@ -62,15 +60,16 @@ export const useCalendarTasks = (view: "month" | "week" | "day", currentMonth: D
           priority: task.priority as Task['priority']
         })) as Task[];
       } catch (error) {
-        console.error('Failed to fetch tasks:', error);
-        toast.error("Failed to load tasks. Please try again later.");
-        throw error;
+        if (error instanceof AppError) {
+          throw error;
+        }
+        throw new AppError('Failed to fetch tasks', 'UNKNOWN_ERROR', error);
       }
     },
     enabled: !!user,
     retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
-    refetchOnWindowFocus: false // Prevent unnecessary refetches
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false
   });
 };

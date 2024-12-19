@@ -1,12 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ActivityList } from "./activity/ActivityList";
 import { LoadingState } from "./activity/LoadingState";
 import { EmptyState } from "./activity/EmptyState";
+import { handleError } from "@/lib/error-handling";
 
 export const RecentActivity = () => {
   const { user } = useAuth();
@@ -39,7 +39,6 @@ export const RecentActivity = () => {
     enabled: !!user
   });
 
-  // Set up real-time subscription for tasks and messages
   useEffect(() => {
     if (!user) return;
 
@@ -75,8 +74,7 @@ export const RecentActivity = () => {
   }, [user, queryClient]);
 
   if (error) {
-    console.error('Error fetching activity:', error);
-    toast.error("Failed to load recent activity");
+    handleError(error);
     return null;
   }
 

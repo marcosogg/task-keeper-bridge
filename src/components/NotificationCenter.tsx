@@ -3,13 +3,12 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useToast } from "@/hooks/use-toast";
 import { useNotifications } from "@/hooks/queries/useNotifications";
 import { NotificationBell } from "./notifications/NotificationBell";
 import { NotificationList } from "./notifications/NotificationList";
+import { handleError } from "@/lib/error-handling";
 
 export const NotificationCenter = () => {
-  const { toast } = useToast();
   const { notifications, isLoading, markAsRead, dismiss } = useNotifications();
 
   const unreadCount = notifications?.filter(n => !n.read).length || 0;
@@ -17,32 +16,16 @@ export const NotificationCenter = () => {
   const handleMarkAsRead = async (id: string) => {
     try {
       await markAsRead(id);
-      toast({
-        title: "Notification marked as read",
-        description: "The notification has been marked as read.",
-      });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to mark notification as read.",
-        variant: "destructive",
-      });
+      handleError(error, "Failed to mark notification as read");
     }
   };
 
   const handleDismiss = async (id: string) => {
     try {
       await dismiss(id);
-      toast({
-        title: "Notification dismissed",
-        description: "The notification has been removed.",
-      });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to dismiss notification.",
-        variant: "destructive",
-      });
+      handleError(error, "Failed to dismiss notification");
     }
   };
 

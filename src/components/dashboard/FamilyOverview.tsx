@@ -6,15 +6,14 @@ import { FamilyHeader } from "./family/FamilyHeader";
 import { FamilyMembersList } from "./family/FamilyMembersList";
 import { FamilyStatistics } from "./family/FamilyStatistics";
 import { useFamilyOverview } from "@/hooks/queries/useFamilyOverview";
-import { toast } from "sonner";
+import { handleError } from "@/lib/error-handling";
 
 export const FamilyOverview = () => {
   const { familyMembers, isLoading, error, familyId } = useFamilyOverview();
   const { memberStats, isLoading: isLoadingStats } = useFamilyStats(familyId);
 
   if (error) {
-    console.error('Error fetching family members:', error);
-    toast.error("Failed to load family overview");
+    handleError(error, "Failed to load family overview");
     return null;
   }
 
