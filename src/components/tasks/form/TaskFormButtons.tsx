@@ -3,9 +3,14 @@ import { Button } from "@/components/ui/button";
 interface TaskFormButtonsProps {
   onCancel: () => void;
   isSubmitting?: boolean;
+  submitLabel?: string;
 }
 
-export const TaskFormButtons = ({ onCancel, isSubmitting }: TaskFormButtonsProps) => {
+export const TaskFormButtons = ({ 
+  onCancel, 
+  isSubmitting,
+  submitLabel = "Create Task"
+}: TaskFormButtonsProps) => {
   return (
     <div className="flex justify-end gap-3 pt-4 border-t">
       <Button 
@@ -17,7 +22,7 @@ export const TaskFormButtons = ({ onCancel, isSubmitting }: TaskFormButtonsProps
         Cancel
       </Button>
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating..." : "Create Task"}
+        {isSubmitting ? "Saving..." : submitLabel}
       </Button>
     </div>
   );

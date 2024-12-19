@@ -11,9 +11,17 @@ interface TaskDetailsHeaderProps {
   title: string;
   priority: string;
   status: string;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
-export const TaskDetailsHeader = ({ title, priority, status }: TaskDetailsHeaderProps) => {
+export const TaskDetailsHeader = ({ 
+  title, 
+  priority, 
+  status,
+  onEdit,
+  onDelete
+}: TaskDetailsHeaderProps) => {
   const navigate = useNavigate();
 
   return (
@@ -49,12 +57,14 @@ export const TaskDetailsHeader = ({ title, priority, status }: TaskDetailsHeader
         <Button
           variant="outline"
           size="icon"
+          onClick={onEdit}
         >
           <Pencil className="h-4 w-4" />
         </Button>
         <Button
           variant="destructive"
           size="icon"
+          onClick={onDelete}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
