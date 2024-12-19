@@ -45,12 +45,7 @@ export const Sidebar = () => {
           <NavItem 
             icon={Home} 
             label="Dashboard" 
-            href="/"
-          />
-          <NavItem 
-            icon={Users} 
-            label="Family" 
-            href="/family"
+            href="/dashboard"
           />
           <NavItem 
             icon={Calendar} 
@@ -58,9 +53,19 @@ export const Sidebar = () => {
             href="/tasks"
           />
           <NavItem 
+            icon={Calendar} 
+            label="Calendar" 
+            href="/calendar"
+          />
+          <NavItem 
             icon={MessageSquare} 
             label="Messages" 
             href="/messages"
+          />
+          <NavItem 
+            icon={Users} 
+            label="Family" 
+            href="/family"
           />
         </nav>
         

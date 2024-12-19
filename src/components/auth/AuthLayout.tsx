@@ -18,13 +18,13 @@ export const AuthLayout = ({ children, showNav = true }: AuthLayoutProps) => {
             <nav className="flex items-center space-x-6">
               <Link
                 to="/login"
-                className="text-gray-600 hover:text-primary transition-colors"
+                className="text-white bg-primary hover:bg-primary-dark transition-colors px-4 py-2 rounded-lg"
               >
                 Login
               </Link>
               <Link
                 to="/signup"
-                className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors"
+                className="text-white bg-primary hover:bg-primary-dark transition-colors px-4 py-2 rounded-lg"
               >
                 Sign Up
               </Link>
