@@ -1,8 +1,8 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageBubble } from "./MessageBubble";
+import { MessageBubble, Message } from "./MessageBubble";
 
 interface MessageListProps {
-  messages: any[];
+  messages: Message[];
   currentUserId: string;
 }
 

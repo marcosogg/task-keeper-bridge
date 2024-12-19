@@ -1,15 +1,20 @@
 import { format } from "date-fns";
 
+interface MessageSender {
+  id: string;
+  full_name: string | null;
+  avatar_url?: string | null;
+}
+
+export interface Message {
+  id: string;
+  content: string;
+  created_at: string;
+  sender: MessageSender;
+}
+
 interface MessageBubbleProps {
-  message: {
-    id: string;
-    content: string;
-    created_at: string;
-    sender: {
-      id: string;
-      full_name: string;
-    };
-  };
+  message: Message;
   isCurrentUser: boolean;
 }
 
@@ -25,7 +30,7 @@ export const MessageBubble = ({ message, isCurrentUser }: MessageBubbleProps) =>
       >
         <div className="flex items-center gap-2 mb-1">
           <span className="text-sm font-medium">
-            {message.sender.full_name}
+            {message.sender.full_name || "Anonymous"}
           </span>
           <span className="text-xs opacity-70">
             {format(new Date(message.created_at), "p")}

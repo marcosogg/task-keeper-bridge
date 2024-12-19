@@ -6,13 +6,32 @@ import { ConversationHeader } from "./conversation/ConversationHeader";
 import { MessageList } from "./conversation/MessageList";
 import { MessageInput } from "./conversation/MessageInput";
 
+interface Conversation {
+  id: string;
+  name: string | null;
+  created_at: string;
+  created_by: string;
+  family_id: string;
+  conversation_members?: Array<{
+    profile: {
+      id: string;
+      full_name: string | null;
+      avatar_url: string | null;
+    };
+  }>;
+}
+
 interface ConversationViewProps {
-  conversation?: any; // We'll properly type this later
+  conversation?: Conversation;
   onBack: () => void;
   className?: string;
 }
 
-export const ConversationView = ({ conversation, onBack, className }: ConversationViewProps) => {
+export const ConversationView = ({ 
+  conversation, 
+  onBack, 
+  className 
+}: ConversationViewProps) => {
   const { messages, isLoading, sendMessage } = useMessages(conversation?.id);
   const { toast } = useToast();
   const { user } = useAuth();

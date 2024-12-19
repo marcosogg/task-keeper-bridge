@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 
 interface ConversationHeaderProps {
-  name: string;
+  name: string | null;
   onBack: () => void;
 }
 
