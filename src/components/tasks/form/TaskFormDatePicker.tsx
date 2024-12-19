@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -15,7 +14,7 @@ interface TaskFormDatePickerProps {
 export const TaskFormDatePicker = ({ date, onDateChange }: TaskFormDatePickerProps) => {
   return (
     <div>
-      <Label>Due Date</Label>
+      <Label>Due Date (Optional)</Label>
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -24,6 +23,7 @@ export const TaskFormDatePicker = ({ date, onDateChange }: TaskFormDatePickerPro
               "w-full mt-1.5 justify-start text-left font-normal",
               !date && "text-muted-foreground"
             )}
+            type="button"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date ? format(date, "PPP") : "Select date"}

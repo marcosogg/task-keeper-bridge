@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Users, Tag, Paperclip } from "lucide-react";
+import { Users, Paperclip } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -18,18 +18,22 @@ import {
 
 export const TaskFormActions = () => {
   const [isAssigneesOpen, setIsAssigneesOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   
   const handleAssigneesClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
     setIsAssigneesOpen(true);
   };
 
-  const handleCategoryClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submission
+  const handleAttachmentsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    fileInputRef.current?.click();
   };
 
-  const handleAttachmentsClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submission
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedFiles(prev => [...prev, ...files]);
   };
 
   return (
@@ -67,6 +71,13 @@ export const TaskFormActions = () => {
 
       <div>
         <Label>Attachments (Optional)</Label>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
+          multiple
+        />
         <Button 
           variant="outline" 
           className="w-full mt-1.5 justify-start"
@@ -74,8 +85,20 @@ export const TaskFormActions = () => {
           type="button"
         >
           <Paperclip className="mr-2 h-4 w-4" />
-          Add attachments
+          {selectedFiles.length > 0 
+            ? `${selectedFiles.length} file${selectedFiles.length === 1 ? '' : 's'} selected`
+            : 'Add attachments'}
         </Button>
+        {selectedFiles.length > 0 && (
+          <div className="mt-2 text-sm text-muted-foreground">
+            {selectedFiles.map((file, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Paperclip className="h-3 w-3" />
+                {file.name}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Assignees Modal */}
