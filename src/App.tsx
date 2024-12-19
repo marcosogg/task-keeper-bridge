@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AuthProvider } from "./contexts/AuthContext";
+import { FamilyProvider } from "./contexts/FamilyContext";
 import { AppRoutes } from "./routes/AppRoutes";
 
 // Create a client
@@ -28,7 +29,9 @@ const App = () => {
             <Sonner />
             <BrowserRouter>
               <AuthProvider>
-                <AppRoutes />
+                <FamilyProvider>
+                  <AppRoutes />
+                </FamilyProvider>
               </AuthProvider>
             </BrowserRouter>
           </TooltipProvider>

@@ -13,6 +13,7 @@ import { TaskFormActions } from "./form/TaskFormActions";
 import { TaskFormButtons } from "./form/TaskFormButtons";
 import type { Task } from "@/types/task";
 import { useFamilyMembers } from "@/hooks/queries/useFamilyMembers";
+import { useTaskMutations } from "@/hooks/useTaskMutations";
 
 interface TaskCreationFormProps {
   onCancel: () => void;
@@ -30,6 +31,7 @@ export const TaskCreationForm = ({
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: familyMembers } = useFamilyMembers();
+  const { invalidateTaskQueries } = useTaskMutations();
 
   const form = useForm({
     resolver: zodResolver(taskSchema),
@@ -90,7 +92,7 @@ export const TaskCreationForm = ({
     },
     onSuccess: () => {
       toast.success(editMode ? "Task updated successfully" : "Task created successfully");
-      queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] });
+      invalidateTaskQueries();
       if (editMode) {
         queryClient.invalidateQueries({ queryKey: ['task', initialData?.id] });
       }

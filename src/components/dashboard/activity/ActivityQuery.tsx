@@ -15,32 +15,54 @@ export const ActivityQuery = ({ userId, limit = 10, onError, children }: Activit
     queryFn: async () => {
       if (!userId) throw new Error("User not authenticated");
 
-      const { data: familyMember, error: familyError } = await supabase
-        .from('family_members')
-        .select('family_id')
-        .eq('profile_id', userId)
-        .maybeSingle();
+      try {
+        const { data: familyMember, error: familyError } = await supabase
+          .from('family_members')
+          .select('family_id')
+          .eq('profile_id', userId)
+          .maybeSingle();
 
-      if (familyError) throw familyError;
-      if (!familyMember) return [];
+        if (familyError) {
+          console.error('Error fetching family member:', familyError);
+          throw familyError;
+        }
 
-      const { data, error: activityError } = await supabase
-        .rpc('get_family_activity', {
-          family_id_param: familyMember.family_id,
-          limit_param: limit
-        });
+        if (!familyMember) {
+          console.log('No family member found for user:', userId);
+          return [];
+        }
 
-      if (activityError) throw activityError;
-      return data;
+        try {
+          const { data, error: activityError } = await supabase
+            .rpc('get_family_activity', {
+              family_id_param: familyMember.family_id,
+              limit_param: limit
+            });
+
+          if (activityError) {
+            console.error('Error fetching activity:', activityError);
+            return [];
+          }
+
+          return data || [];
+        } catch (rpcError) {
+          console.error('RPC call failed:', rpcError);
+          return [];
+        }
+      } catch (error) {
+        console.error('Error in ActivityQuery:', error);
+        throw error;
+      }
     },
-    enabled: !!userId
+    enabled: !!userId,
+    retry: false
   });
 
   if (error) {
-    handleError(error);
+    console.error('Query error:', error);
     onError(error);
-    return null;
+    return children({ activities: [], isLoading: false });
   }
 
-  return children({ activities, isLoading });
+  return children({ activities: activities || [], isLoading });
 };

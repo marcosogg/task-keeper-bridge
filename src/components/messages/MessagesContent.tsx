@@ -1,30 +1,32 @@
-import { ConversationList } from "./ConversationList";
-import { ConversationView } from "./ConversationView";
 import { useState } from "react";
-import { useConversations } from "@/hooks/queries/useConversations";
+import { useQuery } from "@tanstack/react-query";
+import { useFamily } from "@/contexts/FamilyContext";
+import { messagingService } from "@/services/messaging";
+import { ChatInterface } from "./ChatInterface";
+import { NewPrivateMessageDialog } from "./NewPrivateMessageDialog";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-
-export type Conversation = {
-  id: string;
-  name: string;
-  lastMessage?: string;
-  timestamp?: string;
-  unread: boolean;
-  avatar?: string;
-};
+import { format } from "date-fns";
 
 export const MessagesContent = () => {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const [isMobileViewingConversation, setIsMobileViewingConversation] = useState(false);
-  const { data: conversations, isLoading } = useConversations();
+  const { currentFamily } = useFamily();
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+  const [isMobileViewingChannel, setIsMobileViewingChannel] = useState(false);
 
-  const handleConversationSelect = (conversationId: string) => {
-    setSelectedConversation(conversationId);
-    setIsMobileViewingConversation(true);
+  const { data: channels = [], isLoading } = useQuery({
+    queryKey: ["channels", currentFamily?.id],
+    queryFn: () => messagingService.getChannels(currentFamily!.id),
+    enabled: !!currentFamily,
+  });
+
+  const handleChannelSelect = (channelId: string) => {
+    setSelectedChannel(channelId);
+    setIsMobileViewingChannel(true);
   };
 
   const handleBackToList = () => {
-    setIsMobileViewingConversation(false);
+    setIsMobileViewingChannel(false);
   };
 
   if (isLoading) {
@@ -39,39 +41,56 @@ export const MessagesContent = () => {
     );
   }
 
-  const formattedConversations = conversations?.map((conv: any) => ({
-    id: conv.id,
-    name: conv.name || "New Conversation",
-    lastMessage: conv.messages?.[0]?.content || "No messages yet",
-    timestamp: conv.messages?.[0]?.created_at 
-      ? new Date(conv.messages[0].created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      : "",
-    unread: false, // TODO: Implement unread status
-    avatar: conv.conversation_members?.[0]?.profile?.avatar_url
-  })) || [];
-
-  const selectedConversationData = conversations?.find(
-    (conv: any) => conv.id === selectedConversation
-  );
-
   return (
-    <main className="flex-1 overflow-hidden">
-      <div className="h-[calc(100vh-4rem)] flex">
-        <ConversationList
-          conversations={formattedConversations}
-          selectedConversationId={selectedConversation}
-          onSelect={handleConversationSelect}
-          className={`${
-            isMobileViewingConversation ? "hidden md:block" : "block"
-          } w-full md:w-80 border-r border-gray-200 bg-white`}
-        />
-        <ConversationView
-          conversation={selectedConversationData}
-          onBack={handleBackToList}
-          className={`${
-            isMobileViewingConversation ? "block" : "hidden md:block"
-          } flex-1 bg-white`}
-        />
+    <main className="flex-1 flex">
+      <div
+        className={`w-full md:w-80 border-r ${
+          isMobileViewingChannel ? "hidden md:block" : "block"
+        }`}
+      >
+        <div className="p-4 border-b">
+          <NewPrivateMessageDialog />
+        </div>
+        <ScrollArea className="h-[calc(100vh-13rem)]">
+          <div className="space-y-2 p-4">
+            {channels.map((channel) => (
+              <Button
+                key={channel.id}
+                variant={selectedChannel === channel.id ? "secondary" : "ghost"}
+                className="w-full justify-start"
+                onClick={() => handleChannelSelect(channel.id)}
+              >
+                <div className="flex flex-col items-start">
+                  <span className="font-medium">{channel.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {format(new Date(channel.created_at), "MMM d, yyyy")}
+                  </span>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+
+      <div
+        className={`flex-1 ${
+          !isMobileViewingChannel ? "hidden md:block" : "block"
+        }`}
+      >
+        {selectedChannel ? (
+          <>
+            <div className="md:hidden p-4 border-b">
+              <Button variant="ghost" onClick={handleBackToList}>
+                Back to Channels
+              </Button>
+            </div>
+            <ChatInterface channelId={selectedChannel} />
+          </>
+        ) : (
+          <div className="h-full flex items-center justify-center text-muted-foreground">
+            Select a channel to start messaging
+          </div>
+        )}
       </div>
     </main>
   );

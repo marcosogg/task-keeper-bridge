@@ -9,6 +9,7 @@ import {
 import { NotificationCenter } from "./NotificationCenter";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { FamilySelector } from "./family/FamilySelector";
 
 export const Header = () => {
   const location = useLocation();
@@ -21,6 +22,7 @@ export const Header = () => {
           <Link to="/" className="text-2xl font-bold text-primary-dark">
             TAZQ
           </Link>
+          {user && <FamilySelector />}
           <nav className="hidden md:flex space-x-6">
             <Link
               to="/dashboard"
@@ -53,14 +55,6 @@ export const Header = () => {
               }`}
             >
               Messages
-            </Link>
-            <Link
-              to="/family"
-              className={`text-gray-600 hover:text-primary ${
-                location.pathname === "/family" ? "text-primary" : ""
-              }`}
-            >
-              Family
             </Link>
           </nav>
         </div>

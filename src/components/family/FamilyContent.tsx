@@ -7,17 +7,21 @@ import { InviteMemberModal } from "./InviteMemberModal";
 import { FamilyMemberCard } from "./FamilyMemberCard";
 import { FamilyGroupSettings } from "./FamilyGroupSettings";
 import { CreateFamilyModal } from "./CreateFamilyModal";
+import { JoinFamilyModal } from "./JoinFamilyModal";
 import { useFamilyMembers } from "@/hooks/queries/useFamilyMembers";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { OnlineStatus } from "./OnlineStatus";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export const FamilyContent = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
   const { user } = useAuth();
 
   // First, get the user's family with proper error handling
@@ -89,10 +93,20 @@ export const FamilyContent = () => {
               </Button>
             </>
           ) : (
-            <Button size="sm" onClick={() => setShowCreateModal(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Family Group
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button size="sm" onClick={() => setShowCreateModal(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Group
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => setShowJoinModal(true)}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Join Group
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -101,12 +115,30 @@ export const FamilyContent = () => {
         <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">Members</h3>
+              <div className="space-y-1">
+                <h3 className="text-lg font-medium">Members</h3>
+                <p className="text-sm text-muted-foreground">
+                  {familyMembers?.length || 0} members in {userFamily?.name}
+                </p>
+              </div>
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  {familyMembers?.length || 0} members
-                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    // Copy invite code to clipboard
+                    if (userFamily?.invite_code) {
+                      navigator.clipboard.writeText(userFamily.invite_code);
+                      toast.success("Invite code copied to clipboard");
+                    }
+                  }}
+                >
+                  Copy Invite Code
+                </Button>
+                <Button size="sm" onClick={() => setShowInviteModal(true)}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Invite
+                </Button>
               </div>
             </div>
             <ScrollArea className="h-[calc(100vh-20rem)]">
@@ -122,17 +154,18 @@ export const FamilyContent = () => {
               ) : (
                 <div className="space-y-4">
                   {familyMembers?.map((member) => (
-                    <FamilyMemberCard
-                      key={member.id}
-                      member={{
-                        id: member.id,
-                        name: member.profiles?.full_name || member.profiles?.email || 'Unknown',
-                        role: member.role,
-                        avatar: member.profiles?.avatar_url || member.profiles?.full_name?.charAt(0) || 'U',
-                        status: member.status,
-                        email: member.profiles?.email || ''
-                      }}
-                    />
+                    <div key={member.id} className="flex items-center justify-between p-2 border-b">
+                      <div className="flex items-center gap-4">
+                        <Avatar>
+                          <AvatarFallback>{member.profiles?.full_name?.[0] || "U"}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{member.profiles?.full_name}</p>
+                          <p className="text-sm text-muted-foreground">{member.role}</p>
+                        </div>
+                      </div>
+                      <OnlineStatus familyId={userFamily.id} userId={member.profiles?.id} />
+                    </div>
                   ))}
                 </div>
               )}
@@ -147,18 +180,24 @@ export const FamilyContent = () => {
         </div>
       ) : (
         <Card className="p-6">
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-6">
             <Users className="h-12 w-12 mx-auto text-muted-foreground" />
             <div className="space-y-2">
               <h3 className="text-lg font-medium">No Family Group</h3>
-              <p className="text-sm text-muted-foreground">
-                Create a family group to start managing tasks and events together
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                Create a new family group or join an existing one to start managing tasks and events together.
               </p>
             </div>
-            <Button onClick={() => setShowCreateModal(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Family Group
-            </Button>
+            <div className="flex items-center justify-center gap-4">
+              <Button onClick={() => setShowCreateModal(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Group
+              </Button>
+              <Button variant="outline" onClick={() => setShowJoinModal(true)}>
+                <Users className="h-4 w-4 mr-2" />
+                Join Group
+              </Button>
+            </div>
           </div>
         </Card>
       )}
@@ -171,6 +210,11 @@ export const FamilyContent = () => {
       <InviteMemberModal
         open={showInviteModal}
         onOpenChange={setShowInviteModal}
+      />
+
+      <JoinFamilyModal
+        open={showJoinModal}
+        onOpenChange={setShowJoinModal}
       />
     </main>
   );
