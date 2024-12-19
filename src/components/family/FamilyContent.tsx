@@ -12,33 +12,51 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const FamilyContent = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
 
-  // First, get the user's family
-  const { data: userFamily } = useQuery({
+  // First, get the user's family with proper error handling
+  const { data: userFamily, error: familyError } = useQuery({
     queryKey: ['userFamily', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
       
-      const { data: familyMember } = await supabase
-        .from('family_members')
-        .select('families(*)')
-        .eq('profile_id', user.id)
-        .eq('status', 'active')
-        .maybeSingle();
+      try {
+        const { data: familyMember, error } = await supabase
+          .from('family_members')
+          .select('families(*)')
+          .eq('profile_id', user.id)
+          .eq('status', 'active')
+          .maybeSingle();
 
-      return familyMember?.families;
+        if (error) {
+          console.error('Error fetching family:', error);
+          throw error;
+        }
+
+        return familyMember?.families;
+      } catch (error) {
+        console.error('Failed to fetch family data:', error);
+        throw error;
+      }
     },
     enabled: !!user?.id,
+    retry: 3, // Retry failed requests 3 times
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
   
-  const { data: familyMembers, isLoading } = useFamilyMembers(userFamily?.id);
+  const { data: familyMembers, isLoading, error: membersError } = useFamilyMembers(userFamily?.id);
+
+  // Handle errors gracefully
+  if (familyError || membersError) {
+    toast.error("Failed to load family data. Please try again later.");
+    console.error('Family data error:', familyError || membersError);
+  }
 
   const hasFamily = userFamily !== null && userFamily !== undefined;
 
