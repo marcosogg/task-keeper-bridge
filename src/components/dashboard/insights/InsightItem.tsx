@@ -1,6 +1,5 @@
 import { AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 
 interface InsightItemProps {
   id: string;
@@ -9,7 +8,7 @@ interface InsightItemProps {
   priority: string;
   dueDate: string;
   assignedTo: string;
-  onActionClick?: (id: string) => void;  // Added this prop
+  onActionClick: (id: string) => void;
 }
 
 export const InsightItem = ({
@@ -21,16 +20,6 @@ export const InsightItem = ({
   assignedTo,
   onActionClick,
 }: InsightItemProps) => {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    if (onActionClick) {
-      onActionClick(id);
-    } else {
-      navigate(`/tasks/${id}`);
-    }
-  };
-
   return (
     <div
       className="flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50 transition-colors"
@@ -57,7 +46,7 @@ export const InsightItem = ({
         size="sm" 
         variant={status === "overdue" ? "destructive" : "default"}
         className="min-w-[100px]"
-        onClick={handleClick}
+        onClick={() => onActionClick(id)}
         aria-label={`View details for ${title}`}
       >
         View Details
