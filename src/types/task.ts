@@ -5,7 +5,7 @@ export interface Task {
   status: 'todo' | 'in_progress' | 'completed';
   priority: 'low' | 'medium' | 'high';
   due_date?: string;
-  assigned_to?: string; // Changed from string[] to string to match DB schema
+  assigned_to?: string;
   created_by: string;
   family_id: string;
   created_at: string;

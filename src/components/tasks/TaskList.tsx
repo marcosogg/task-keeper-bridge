@@ -1,8 +1,9 @@
-import { Clock, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Clock, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTasks } from "@/hooks/queries/useTasks";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 export const TaskList = () => {
   const { data: tasks, isLoading, error } = useTasks();
@@ -68,7 +69,7 @@ export const TaskList = () => {
             <div>
               <p className="font-medium text-gray-900">{task.title}</p>
               <div className="flex items-center space-x-2 text-sm text-gray-500">
-                <span>Due: {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date'}</span>
+                <span>Due: {task.due_date ? format(new Date(task.due_date), 'MMM dd, yyyy') : 'No due date'}</span>
                 <span>•</span>
                 <span>Assigned to: {task.assigned_to_profile?.full_name || 'Unassigned'}</span>
               </div>

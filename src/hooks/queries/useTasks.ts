@@ -1,20 +1,43 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import type { Task } from "@/types/task";
 
 export const useTasks = () => {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ['tasks'],
+    queryKey: ['tasks', user?.id],
     queryFn: async () => {
+      if (!user) throw new Error("User not authenticated");
+
+      // First get the user's family_id
+      const { data: familyMember, error: familyError } = await supabase
+        .from('family_members')
+        .select('family_id')
+        .eq('profile_id', user.id)
+        .maybeSingle();
+
+      if (familyError) {
+        console.error('Error fetching family:', familyError);
+        throw familyError;
+      }
+
+      if (!familyMember) {
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('tasks')
         .select(`
           *,
-          profile:profiles!tasks_assigned_to_fkey (
+          assigned_to_profile:profiles!tasks_assigned_to_fkey (
             full_name,
-            email
+            email,
+            avatar_url
           )
         `)
+        .eq('family_id', familyMember.family_id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -22,22 +45,8 @@ export const useTasks = () => {
         throw error;
       }
 
-      return data.map(task => ({
-        id: task.id,
-        title: task.title,
-        description: task.description || undefined,
-        status: task.status,
-        priority: task.priority,
-        due_date: task.due_date || undefined,
-        assigned_to: task.assigned_to,
-        created_by: task.created_by,
-        family_id: task.family_id,
-        created_at: task.created_at,
-        updated_at: task.updated_at,
-        completed_at: task.completed_at || undefined,
-        assigned_to_profile: task.profile || undefined
-      })) as Task[];
+      return data as Task[];
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!user,
   });
 };
