@@ -4,22 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useMessages } from "@/hooks/queries/useMessages";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Send } from "lucide-react";
+import { ChevronLeft, Loader2, Send } from "lucide-react";
 import { format } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ConversationViewProps {
-  conversationId?: string;
+  conversation?: any; // We'll properly type this later
+  onBack: () => void;
+  className?: string;
 }
 
-export const ConversationView = ({ conversationId }: ConversationViewProps) => {
+export const ConversationView = ({ conversation, onBack, className }: ConversationViewProps) => {
   const [newMessage, setNewMessage] = useState("");
-  const { messages, isLoading, sendMessage } = useMessages(conversationId);
+  const { messages, isLoading, sendMessage } = useMessages(conversation?.id);
   const { toast } = useToast();
   const { user } = useAuth();
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !conversationId) return;
+    if (!newMessage.trim() || !conversation?.id) return;
 
     try {
       await sendMessage({ content: newMessage.trim() });
@@ -33,9 +35,9 @@ export const ConversationView = ({ conversationId }: ConversationViewProps) => {
     }
   };
 
-  if (!conversationId) {
+  if (!conversation) {
     return (
-      <div className="flex-1 flex items-center justify-center text-gray-500">
+      <div className={`flex-1 flex items-center justify-center text-gray-500 ${className}`}>
         Select a conversation to start messaging
       </div>
     );
@@ -43,14 +45,21 @@ export const ConversationView = ({ conversationId }: ConversationViewProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center">
+      <div className={`flex-1 flex items-center justify-center ${className}`}>
         <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className={`flex-1 flex flex-col h-full ${className}`}>
+      <div className="border-b p-4 flex items-center gap-2">
+        <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="font-medium">{conversation.name || "New Conversation"}</span>
+      </div>
+
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message) => (
