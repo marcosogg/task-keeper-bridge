@@ -1,13 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import { TaskDialog } from "./calendar/TaskDialog";
 import { CalendarWrapper } from "./calendar/CalendarWrapper";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CalendarHeader } from "./calendar/CalendarHeader";
+import { CalendarSkeleton } from "./calendar/CalendarSkeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import type { Task } from "@/types/task";
 
 export const StatsPanel = () => {
@@ -15,18 +16,18 @@ export const StatsPanel = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const { data: tasks, isLoading } = useQuery({
+  const { data: tasks, isLoading, error } = useQuery({
     queryKey: ['tasks', user?.id],
     queryFn: async () => {
       if (!user) throw new Error("User not authenticated");
 
-      // First get the user's family_id
       const { data: familyMember, error: familyError } = await supabase
         .from('family_members')
         .select('family_id')
         .eq('profile_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (familyError) throw familyError;
 
@@ -39,11 +40,10 @@ export const StatsPanel = () => {
             avatar_url
           )
         `)
-        .eq('family_id', familyMember.family_id);
+        .eq('family_id', familyMember?.family_id);
 
       if (error) throw error;
       
-      // Ensure the data matches our Task type
       return (data as any[]).map(task => ({
         ...task,
         status: task.status as Task['status'],
@@ -52,6 +52,44 @@ export const StatsPanel = () => {
     },
     enabled: !!user
   });
+
+  useEffect(() => {
+    if (!user) return;
+
+    const getFamilyId = async () => {
+      const { data: familyMember } = await supabase
+        .from('family_members')
+        .select('family_id')
+        .eq('profile_id', user.id)
+        .maybeSingle();
+      
+      return familyMember?.family_id;
+    };
+
+    getFamilyId().then(familyId => {
+      if (!familyId) return;
+
+      const channel = supabase
+        .channel('schema-db-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'tasks',
+            filter: `family_id=eq.${familyId}`
+          },
+          () => {
+            void queryClient.invalidateQueries({ queryKey: ['tasks'] });
+          }
+        )
+        .subscribe();
+
+      return () => {
+        void supabase.removeChannel(channel);
+      };
+    });
+  }, [user, queryClient]);
 
   const getDayTasks = (date: Date) => {
     if (!tasks) return [];
@@ -71,38 +109,19 @@ export const StatsPanel = () => {
     setIsDialogOpen(true);
   };
 
+  if (error) {
+    console.error('Error fetching tasks:', error);
+    toast.error("Failed to load calendar tasks");
+    return null;
+  }
+
   if (isLoading) {
-    return (
-      <Card className="w-full h-full">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xl font-semibold">Calendar</CardTitle>
-          <Skeleton className="h-9 w-[100px]" />
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-7 gap-1">
-              {Array.from({ length: 35 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-square rounded-md" />
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <CalendarSkeleton />;
   }
 
   return (
     <Card className="w-full h-full">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl font-semibold">Calendar</CardTitle>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => setCurrentMonth(new Date())}
-        >
-          Today
-        </Button>
-      </CardHeader>
+      <CalendarHeader onTodayClick={() => setCurrentMonth(new Date())} />
       <CardContent>
         <CalendarWrapper
           selectedDate={selectedDate}
