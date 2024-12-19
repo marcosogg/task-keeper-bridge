@@ -42,7 +42,13 @@ export const StatsPanel = () => {
         .eq('family_id', familyMember.family_id);
 
       if (error) throw error;
-      return data;
+      
+      // Ensure the data matches our Task type
+      return (data as any[]).map(task => ({
+        ...task,
+        status: task.status as Task['status'],
+        priority: task.priority as Task['priority']
+      })) as Task[];
     },
     enabled: !!user
   });
