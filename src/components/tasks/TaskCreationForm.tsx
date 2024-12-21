@@ -1,3 +1,5 @@
+// src/components/tasks/TaskCreationForm.tsx
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { taskSchema } from "@/lib/validations";
@@ -22,16 +24,17 @@ interface TaskCreationFormProps {
   initialData?: Task;
 }
 
-export const TaskCreationForm = ({ 
-  onCancel, 
-  onSuccess, 
+export const TaskCreationForm = ({
+  onCancel,
+  onSuccess,
   editMode = false,
-  initialData 
+  initialData,
 }: TaskCreationFormProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: familyMembers } = useFamilyMembers();
   const { invalidateTaskQueries } = useTaskMutations();
+  const [status, setStatus] = useState<string | null>("todo");
 
   const form = useForm({
     resolver: zodResolver(taskSchema),
@@ -74,7 +77,7 @@ export const TaskCreationForm = ({
         assigned_to: data.assignedTo?.[0],
         family_id: familyMember.family_id,
         created_by: user.id,
-        status: data.status,
+        status: editMode ? data.status : "todo",
       };
 
       if (editMode && initialData) {
@@ -98,6 +101,7 @@ export const TaskCreationForm = ({
       }
       onSuccess();
       form.reset();
+      setStatus("todo");
     },
     onError: (error) => {
       console.error('Error saving task:', error);

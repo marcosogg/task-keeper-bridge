@@ -1,13 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+// src/hooks/queries/useTasks.ts
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Task } from "@/types/task";
 import type { TaskResponse } from "@/integrations/supabase/types/responses";
+import { useEffect } from "react";
 
 export const useTasks = () => {
   const { user } = useAuth();
+    const queryClient = useQueryClient();
 
-  return useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['tasks', user?.id],
     queryFn: async () => {
       if (!user) throw new Error("User not authenticated");
@@ -59,4 +62,45 @@ export const useTasks = () => {
     },
     enabled: !!user,
   });
+
+      useEffect(() => {
+        if (!user) return;
+
+        const getFamilyId = async () => {
+        const { data: familyMember } = await supabase
+            .from('family_members')
+            .select('family_id')
+            .eq('profile_id', user.id)
+            .maybeSingle();
+    
+          return familyMember?.family_id;
+        };
+
+        getFamilyId().then(familyId => {
+            if (!familyId) return;
+           
+          const channel = supabase
+            .channel('schema-db-changes')
+            .on(
+              'postgres_changes',
+              {
+                event: '*',
+                schema: 'public',
+                table: 'tasks',
+                filter: `family_id=eq.${familyId}`
+              },
+              () => {
+                queryClient.invalidateQueries({ queryKey: ['tasks'] });
+              }
+            )
+            .subscribe();
+    
+          return () => {
+            supabase.removeChannel(channel);
+            };
+        });
+      }, [user, queryClient]);
+
+  return { data: data || [], isLoading, error };
 };
+

@@ -8,6 +8,7 @@ export const taskSchema = z.object({
   status: z.enum(["todo", "in_progress", "completed", "cancelled"]),
   assignedTo: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
+  familyId: z.string().optional(),
 });
 
 export const eventSchema = z.object({

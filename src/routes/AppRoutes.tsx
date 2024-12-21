@@ -13,7 +13,7 @@ import HelpCenter from "@/pages/support/HelpCenter";
 import ContactSupport from "@/pages/support/ContactSupport";
 import TermsOfService from "@/pages/support/TermsOfService";
 import PrivacyPolicy from "@/pages/support/PrivacyPolicy";
-import { TaskDetailsPage } from "@/components/tasks/TaskDetailsPage";
+import TaskDetailsPage from "@/components/tasks/TaskDetailsPage";
 
 export const AppRoutes = () => {
   return (

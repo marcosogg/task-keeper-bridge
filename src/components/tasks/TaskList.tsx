@@ -1,3 +1,4 @@
+// src/components/tasks/TaskList.tsx
 import { Clock, AlertTriangle, CheckCircle2, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,6 +9,9 @@ import { useState } from "react";
 import { ViewTaskModal } from "./ViewTaskModal";
 import { EditTaskModal } from "./EditTaskModal";
 import { DeleteTaskDialog } from "./details/DeleteTaskDialog";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import type { Task } from "@/types/task";
 
 export const TaskList = () => {
   const { data: tasks, isLoading, error } = useTasks();
@@ -83,11 +87,15 @@ export const TaskList = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="px-2 py-1 text-sm rounded-full bg-primary/10 text-primary">
-              {task.status === "todo" ? "To Do" : 
-               task.status === "in_progress" ? "In Progress" : 
-               "Completed"}
-            </div>
+             <Badge variant="outline" className={cn("capitalize",
+                  task.status === "todo" ? "bg-gray-100 text-gray-600" :
+                  task.status === "in_progress" ? "bg-yellow-100 text-yellow-600" :
+                  task.status === "completed" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600",
+                )}>
+                 {task.status === "todo" ? "To Do" :
+                task.status === "in_progress" ? "In Progress" :
+                task.status === "completed" ? "Completed" : "Cancelled"}
+            </Badge>
             <div className="flex items-center gap-1">
               <Button 
                 size="icon" 
@@ -154,3 +162,4 @@ export const TaskList = () => {
     </>
   );
 };
+  

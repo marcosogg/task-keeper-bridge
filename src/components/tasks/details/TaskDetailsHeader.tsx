@@ -1,3 +1,4 @@
+// src/components/tasks/details/TaskDetailsHeader.tsx
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,8 +42,10 @@ export const TaskDetailsHeader = ({
           <Badge 
             variant="outline"
             className="capitalize"
-          >
-            {status}
+            >
+            {status === "todo" ? "To Do" :
+                status === "in_progress" ? "In Progress" :
+                status === "completed" ? "Completed" : "Cancelled"}
           </Badge>
         </div>
       </div>
