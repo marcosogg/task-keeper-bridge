@@ -43,7 +43,7 @@ export const ViewTaskModal = ({
             .from('tasks')
             .select(`
               *,
-              assigned_to_profile:profiles!tasks_assigned_to_fkey (
+              assigned_to_profile:profiles!tasks_assigned_to_fkey(
                 full_name,
                 email,
                 avatar_url
@@ -57,16 +57,19 @@ export const ViewTaskModal = ({
             throw error;
           }
           if (!data) throw new Error('Task not found');
-           // Ensure the status is one of the allowed values
+          
+          // Ensure the status is one of the allowed values
           const validStatus = ['todo', 'in_progress', 'completed', 'cancelled'].includes(data.status)
             ? (data.status as Task['status'])
             : 'todo';
           
-             return {
-               ...data,
-                 assigned_to: data.assigned_to ? [data.assigned_to] : null,
+          // Transform the data to match our Task type
+          return {
+            ...data,
+            assigned_to: data.assigned_to ? (Array.isArray(data.assigned_to) ? data.assigned_to : [data.assigned_to]) : null,
+            assigned_to_profile: data.assigned_to_profile ? (Array.isArray(data.assigned_to_profile) ? data.assigned_to_profile : [data.assigned_to_profile]) : [],
             status: validStatus
-            } as Task;
+          } as Task;
         },
         enabled: !!taskId,
         retry: 1,
@@ -119,7 +122,7 @@ export const ViewTaskModal = ({
           <TaskDetailsContent
               description={task.description}
               dueDate={task.due_date}
-              assignedToName={task.assigned_to_profile?.full_name}
+              assignedToName={task.assigned_to_profile?.[0]?.full_name}
               task={task}
            />
           </DialogContent>

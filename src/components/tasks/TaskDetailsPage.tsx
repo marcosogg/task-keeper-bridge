@@ -1,120 +1,142 @@
-// src/components/tasks/TaskDetailsPage.tsx
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
-import { MainContent } from "@/components/MainContent";
-import { useState } from "react";
 import { TaskDetailsHeader } from "./details/TaskDetailsHeader";
 import { TaskDetailsContent } from "./details/TaskDetailsContent";
-import { TaskDetailsError } from "./details/TaskDetailsError";
 import { TaskDetailsSkeleton } from "./details/TaskDetailsSkeleton";
-import { EditTaskModal } from "./EditTaskModal";
+import { TaskDetailsError } from "./details/TaskDetailsError";
+import { Card } from "@/components/ui/card";
 import { DeleteTaskDialog } from "./details/DeleteTaskDialog";
+import { EditTaskModal } from "./EditTaskModal";
+import { useState } from "react";
 import type { Task } from "@/types/task";
+import { useAuth } from "@/contexts/AuthContext";
+import {  PostgrestError } from "@supabase/supabase-js";
 
-const TaskDetailsContainer = () => {
-  const { taskId } = useParams<{ taskId: string }>();
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+interface Profile {
+    full_name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+    id: string
+}
+const TaskDetailsPage = () => {
+    const { taskId } = useParams();
+    const { user } = useAuth();
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const { data: task, isLoading, error } = useQuery({
-    queryKey: ['task', taskId],
-    queryFn: async () => {
-      if (!taskId) throw new Error('Task ID is required');
-
-      const { data, error } = await supabase
-        .from('tasks')
-        .select(`
-          *,
-          assigned_to_profile:profiles!tasks_assigned_to_fkey (
-            full_name,
-            email,
-            avatar_url
-          )
-        `)
-        .eq('id', taskId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching task:', error);
-        throw error;
-      }
-      if (!data) throw new Error('Task not found');
-      
-      // Ensure the status is one of the allowed values
-      const validStatus = ['todo', 'in_progress', 'completed', 'cancelled'].includes(data.status)
-        ? (data.status as Task['status'])
-        : 'todo';
-
-        return {
-        ...data,
-            assigned_to: data.assigned_to ? [data.assigned_to] : null,
-        status: validStatus
-        } as Task;
-    },
-    enabled: !!taskId,
-    retry: 1,
-  });
+    const { data: task, isLoading, error } = useQuery({
+        queryKey: ['task', taskId],
+        queryFn: async () => {
+            if (!taskId) throw new Error("Task ID is required");
+            if (!user?.id) throw new Error("User not authenticated");
 
 
-  if (error) {
+            const { data: familyMember, error: familyError } = await supabase
+              .from('family_members')
+              .select('family_id')
+              .eq('profile_id', user.id)
+                .maybeSingle();
+        
+            if (familyError) {
+              console.error('Error fetching family:', familyError);
+                throw familyError;
+            }
+        
+            if (!familyMember) {
+              throw new Error("User is not member of a family");
+            }
+
+            const { data, error } = await supabase
+                .from('tasks')
+              .select(`
+                  *,
+                  assigned_to_profile:task_assignments!task_assignments_task_id_fkey (
+                      profiles!task_assignments_profile_id_fkey (
+                        full_name,
+                        email,
+                        avatar_url,
+                        id
+                      )
+                  )
+              `)
+                .eq('id', taskId)
+                .eq('family_id', familyMember.family_id)
+                .single();
+
+            if (error) {
+                console.error('Error fetching task:', error);
+                throw error;
+            }
+
+          
+             const assignedToProfile = Array.isArray(data?.assigned_to_profile)
+                ? data.assigned_to_profile.map((assignee: any) => ({
+                    full_name: assignee.profiles.full_name,
+                    email: assignee.profiles.email,
+                    avatar_url: assignee.profiles.avatar_url
+                }))
+                  : [];
+
+
+             return {
+                ...data,
+               assigned_to: Array.isArray(data?.assigned_to_profile) ? data.assigned_to_profile.map((assignee: any) => assignee.profiles.id) : [],
+                assigned_to_profile: assignedToProfile,
+            } as Task;
+        },
+        enabled: !!taskId && !!user,
+    });
+
+
+    const handleEditTask = () => {
+        setEditModalOpen(true)
+    }
+    const handleDeleteTask = () => {
+        setDeleteModalOpen(true)
+    }
+
+    if (isLoading) {
+        return <TaskDetailsSkeleton />;
+    }
+
+    if (error) {
+        return <TaskDetailsError />;
+    }
+
+    if (!task) {
+         return <TaskDetailsError />;
+     }
+
+    const assignedToName = task.assigned_to_profile?.[0]?.full_name || null;
+
     return (
-      <MainContent>
-        <div className="p-6">
-          <Card>
-            <TaskDetailsError />
-          </Card>
-        </div>
-      </MainContent>
-    );
-  }
-
-  if (isLoading || !task) {
-    return (
-      <MainContent>
-        <div className="p-6">
-          <Card>
-            <TaskDetailsSkeleton />
-          </Card>
-        </div>
-      </MainContent>
-    );
-  }
-  
-  return (
-    <MainContent>
-      <div className="p-6">
-        <Card className="max-w-4xl mx-auto">
-          <TaskDetailsHeader 
-            title={task.title}
-            priority={task.priority}
-            status={task.status}
-            onEdit={() => setIsEditModalOpen(true)}
-            onDelete={() => setIsDeleteDialogOpen(true)}
-          />
-          <TaskDetailsContent 
-            description={task.description}
-            dueDate={task.due_date}
-            assignedToName={task.assigned_to_profile?.full_name}
-              task={task}
-          />
+        <Card className="max-w-2xl mx-auto">
+          <TaskDetailsHeader
+             title={task.title}
+             priority={task.priority}
+             status={task.status}
+             onEdit={handleEditTask}
+             onDelete={handleDeleteTask}
+            />
+            <TaskDetailsContent
+              description={task.description}
+              dueDate={task.due_date}
+              assignedToName={assignedToName}
+                task={task}
+            />
+           <EditTaskModal
+                open={editModalOpen}
+                onOpenChange={setEditModalOpen}
+                task={task}
+            />
+            <DeleteTaskDialog
+                open={deleteModalOpen}
+                onOpenChange={setDeleteModalOpen}
+                taskId={task.id}
+            />
         </Card>
-      </div>
-
-      <DeleteTaskDialog 
-        open={isDeleteDialogOpen} 
-        onOpenChange={setIsDeleteDialogOpen}
-        taskId={task.id}
-      />
-
-      <EditTaskModal
-        open={isEditModalOpen}
-        onOpenChange={setIsEditModalOpen}
-        task={task}
-      />
-    </MainContent>
-  );
+    );
 };
 
-export default TaskDetailsContainer;
+export default TaskDetailsPage;
