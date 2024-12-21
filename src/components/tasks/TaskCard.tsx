@@ -53,13 +53,17 @@ export const TaskCard = ({ task }: TaskCardProps) => {
         try {
              await supabase
                 .from('tasks')
-                .update({ status })
-                .eq('id', task.id);
+                .update({ 
+                    status,
+                    completed_at: status === 'completed' ? new Date().toISOString() : null
+                })
+                .eq('id', task.id)
 
             invalidateTaskQueries(task.id);
 
         } catch (error) {
             console.error('Failed to update task status:', error);
+            // Here you could add a toast notification to show the error to the user
         }
     };
     
@@ -99,12 +103,12 @@ export const TaskCard = ({ task }: TaskCardProps) => {
           </div>
       </div>
         <div className="flex items-center gap-2">
-            <Badge variant="outline" className="capitalize"
-            >
-                {task.status === "todo" ? "To Do" :
-                    task.status === "in_progress" ? "In Progress" :
-                        task.status === "completed" ? "Completed" : "Cancelled"}
-            </Badge>
+          <Badge variant="outline" className="capitalize"
+          >
+            {task.status === "todo" ? "To Do" :
+              task.status === "in_progress" ? "In Progress" :
+                task.status === "completed" ? "Completed" : "Cancelled"}
+          </Badge>
              <Select
                   defaultValue={task.status}
                   onValueChange={(value) => handleStatusChange(value as Task['status'])}

@@ -19,6 +19,7 @@ interface Profile {
     avatar_url: string | null;
     id: string
 }
+
 const TaskDetailsPage = () => {
     const { taskId } = useParams();
     const { user } = useAuth();
@@ -55,8 +56,8 @@ const TaskDetailsPage = () => {
                       profiles!task_assignments_profile_id_fkey (
                         full_name,
                         email,
-                        avatar_url,
-                        id
+                          avatar_url,
+                         id
                       )
                   )
               `)
@@ -68,13 +69,13 @@ const TaskDetailsPage = () => {
                 console.error('Error fetching task:', error);
                 throw error;
             }
-
-          
-             const assignedToProfile = Array.isArray(data?.assigned_to_profile)
-                ? data.assigned_to_profile.map((assignee: any) => ({
+            
+            const assignedToProfile = Array.isArray(data?.assigned_to_profile)
+                ? data.assigned_to_profile.map((assignee:any) => ({
                     full_name: assignee.profiles.full_name,
                     email: assignee.profiles.email,
-                    avatar_url: assignee.profiles.avatar_url
+                    avatar_url: assignee.profiles.avatar_url,
+                    id: assignee.profiles.id
                 }))
                   : [];
 
@@ -108,7 +109,7 @@ const TaskDetailsPage = () => {
          return <TaskDetailsError />;
      }
 
-    const assignedToName = task.assigned_to_profile?.[0]?.full_name || null;
+    const assignedToName = task.assigned_to_profile?.map(assignee => assignee.full_name).join(', ') || null;
 
     return (
         <Card className="max-w-2xl mx-auto">
