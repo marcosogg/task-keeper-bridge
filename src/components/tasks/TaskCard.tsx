@@ -25,17 +25,19 @@ import {
 } from "@/components/ui/select";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { supabase } from "@/integrations/supabase/client";
-
+import { ViewTaskModal } from "./ViewTaskModal";
 
 interface TaskCardProps {
-  task: Task;
+    task: Task;
+    isModalView?: boolean;
 }
 
-export const TaskCard = ({ task }: TaskCardProps) => {
+export const TaskCard = ({ task, isModalView }: TaskCardProps) => {
   const navigate = useNavigate();
   const { invalidateTaskQueries } = useTaskMutations();
-    const [editModalOpen, setEditModalOpen] = useState(false);
-    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [detailsModalOpen, setDetailsModalOpen] = useState(false);
 
     const handleEditTask = () => {
         setEditModalOpen(true);
@@ -45,28 +47,30 @@ export const TaskCard = ({ task }: TaskCardProps) => {
         setDeleteModalOpen(true);
     };
 
-    const handleTaskClick = () => {
-        navigate(`/tasks/${task.id}`);
-    };
+  const handleTaskClick = () => {
+    if (isModalView) {
+        setDetailsModalOpen(true)
+    } else {
+      navigate(`/tasks/${task.id}`);
+    }
+  };
+
 
     const handleStatusChange = async (status: Task['status']) => {
         try {
-             await supabase
+            await supabase
                 .from('tasks')
-                .update({ 
+                .update({
                     status,
                     completed_at: status === 'completed' ? new Date().toISOString() : null
                 })
                 .eq('id', task.id)
-
+               
             invalidateTaskQueries(task.id);
-
         } catch (error) {
             console.error('Failed to update task status:', error);
-            // Here you could add a toast notification to show the error to the user
         }
     };
-    
 
   const getStatusIcon = () => {
     switch (task.status) {
@@ -83,68 +87,78 @@ export const TaskCard = ({ task }: TaskCardProps) => {
 
 
   return (
-    <div className="flex items-center justify-between p-4 rounded-lg border bg-white hover:bg-gray-50 transition-colors">
-      <div className="flex items-center gap-4">
-          <div className={cn(
+    <>
+      <div
+        onClick={handleTaskClick}
+        className="flex items-center justify-between p-4 rounded-lg border bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+      >
+        <div className="flex items-center gap-4">
+            <div className={cn(
               "w-4 h-4 rounded-full",
               task.status === "completed" ? "bg-green-500" : getPriorityColor(task.priority),
-          )}>
-              {getStatusIcon()}
-          </div>
-          <div className="space-y-1" onClick={handleTaskClick}>
-              <h4 className="font-medium">{task.title}</h4>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {task.due_date && (
-                      <span>
+            )}>
+                {getStatusIcon()}
+            </div>
+            <div className="space-y-1">
+                <h4 className="font-medium">{task.title}</h4>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {task.due_date && (
+                        <span>
                         {new Date(task.due_date).toLocaleDateString()}
-                      </span>
-                  )}
-              </div>
-          </div>
-      </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="capitalize"
-          >
-            {task.status === "todo" ? "To Do" :
-              task.status === "in_progress" ? "In Progress" :
-                task.status === "completed" ? "Completed" : "Cancelled"}
-          </Badge>
-             <Select
-                  defaultValue={task.status}
-                  onValueChange={(value) => handleStatusChange(value as Task['status'])}
-                >
-                  <SelectTrigger className="w-[120px]">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todo">To Do</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={handleEditTask}>Edit</DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive" onClick={handleDeleteTask}>Delete</DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-           <EditTaskModal
-            open={editModalOpen}
-            onOpenChange={setEditModalOpen}
-            task={task}
-            />
-            <DeleteTaskDialog
-                open={deleteModalOpen}
-                onOpenChange={setDeleteModalOpen}
-                taskId={task.id}
-            />
+                        </span>
+                    )}
+                </div>
+            </div>
         </div>
-    </div>
+        <div className="flex items-center gap-2">
+            <Badge variant="outline" className="capitalize"
+            >
+              {task.status === "todo" ? "To Do" :
+                task.status === "in_progress" ? "In Progress" :
+                  task.status === "completed" ? "Completed" : "Cancelled"}
+            </Badge>
+          <Select
+              defaultValue={task.status}
+              onValueChange={(value) => handleStatusChange(value as Task['status'])}
+            >
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todo">To Do</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={handleEditTask}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={handleDeleteTask}>Delete</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+      </div>
+        <ViewTaskModal
+            open={detailsModalOpen}
+            onOpenChange={setDetailsModalOpen}
+            task={task}
+        />
+      <EditTaskModal
+          open={editModalOpen}
+          onOpenChange={setEditModalOpen}
+          task={task}
+      />
+       <DeleteTaskDialog
+          open={deleteModalOpen}
+           onOpenChange={setDeleteModalOpen}
+           taskId={task.id}
+       />
+    </>
   );
 };

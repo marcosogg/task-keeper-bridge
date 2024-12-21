@@ -1,8 +1,13 @@
 import { TaskFilters } from "./TaskFilters";
 import { TaskList } from "./TaskList";
 import { CreateTazqButton } from "@/components/CreateTazqButton";
+import { useState } from "react";
 
 export const TasksContent = () => {
+    const [activeFilter, setActiveFilter] = useState<'all' | 'assigned' | 'created' | 'completed'>('all');
+    const [activeSort, setActiveSort] = useState<'date' | 'priority' | 'created'>('date');
+    const isModalView = true;
+
   return (
     <main className="flex-1 bg-gray-50 p-4 md:p-6" role="main" aria-label="Tasks main content">
       <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
@@ -11,8 +16,13 @@ export const TasksContent = () => {
           <CreateTazqButton variant="default" />
         </div>
         
-        <TaskFilters />
-        <TaskList />
+        <TaskFilters 
+             activeFilter={activeFilter}
+             activeSort={activeSort}
+             onFilterChange={setActiveFilter}
+             onSortChange={setActiveSort}
+         />
+         <TaskList filter={activeFilter} sort={activeSort} isModalView={isModalView}/>
       </div>
     </main>
   );

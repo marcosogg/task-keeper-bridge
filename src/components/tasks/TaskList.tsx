@@ -7,9 +7,10 @@ import { ClipboardList } from "lucide-react";
 interface TaskListProps {
     filter: 'all' | 'assigned' | 'created' | 'completed';
     sort: 'date' | 'priority' | 'created';
+    isModalView?: boolean
 }
 
-export const TaskList = ({ filter, sort }: TaskListProps) => {
+export const TaskList = ({ filter, sort, isModalView = true }: TaskListProps) => {
   const { data: tasks, isLoading, error } = useTasks(filter, sort);
 
     if (isLoading) {
@@ -32,7 +33,7 @@ export const TaskList = ({ filter, sort }: TaskListProps) => {
   return (
       <div className="mt-4 space-y-4">
         {tasks?.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} task={task} isModalView={isModalView} />
         ))}
       </div>
   );
