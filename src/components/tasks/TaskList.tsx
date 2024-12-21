@@ -12,12 +12,65 @@ import { DeleteTaskDialog } from "./details/DeleteTaskDialog";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { Task } from "@/types/task";
+import { TaskSubscription } from "./TaskSubscription";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useTaskMutations } from "@/hooks/useTaskMutations";
 
 export const TaskList = () => {
   const { data: tasks, isLoading, error } = useTasks();
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [editTaskId, setEditTaskId] = useState<string | null>(null);
   const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
+    const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { invalidateTaskQueries } = useTaskMutations();
+  
+  const mutation = useMutation({
+        mutationFn: async (data: any) => {
+            if (!user) throw new Error("User not authenticated");
+        
+        const taskData = {
+            id: data.id,
+            title: data.title,
+            description: data.description,
+            priority: data.priority,
+            due_date: data.due_date,
+            assigned_to: data.assigned_to,
+            status: data.status,
+          };
+    
+          if (taskData?.id) {
+            const { error } = await supabase
+              .from('tasks')
+              .update(taskData)
+              .eq('id', taskData.id);
+            if (error) throw error;
+           }
+            return taskData as Task;
+        },
+        onSuccess: (data) => {
+           invalidateTaskQueries(data.id);
+            toast.success("Task updated successfully");
+          
+        },
+        onError: (error) => {
+            console.error('Error saving task:', error);
+          toast.error("Failed to update task");
+        }
+    });
+
+   const handleStatusChange = (value: 'todo' | 'in_progress' | 'completed' | 'cancelled', task: Task) => {
+         mutation.mutate({ ...task, status: value})
+    }
 
   if (error) {
     toast.error("Failed to load tasks");
@@ -87,15 +140,20 @@ export const TaskList = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-             <Badge variant="outline" className={cn("capitalize",
-                  task.status === "todo" ? "bg-gray-100 text-gray-600" :
-                  task.status === "in_progress" ? "bg-yellow-100 text-yellow-600" :
-                  task.status === "completed" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600",
-                )}>
-                 {task.status === "todo" ? "To Do" :
-                task.status === "in_progress" ? "In Progress" :
-                task.status === "completed" ? "Completed" : "Cancelled"}
-            </Badge>
+              <Select 
+                onValueChange={(value) => handleStatusChange(value as 'todo' | 'in_progress' | 'completed' | 'cancelled', task)}
+                defaultValue={task.status}
+                >
+              <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="todo">To Do</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+            </Select>
             <div className="flex items-center gap-1">
               <Button 
                 size="icon" 
@@ -162,4 +220,3 @@ export const TaskList = () => {
     </>
   );
 };
-  

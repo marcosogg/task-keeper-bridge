@@ -1,17 +1,25 @@
+// src/components/tasks/details/TaskDetailsContent.tsx
 import { CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
+import type { Task } from "@/types/task";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { getPriorityColor } from "@/utils/styles";
 
 interface TaskDetailsContentProps {
   description?: string | null;
   dueDate?: string | null;
   assignedToName?: string | null;
+    task?: Task
 }
 
 export const TaskDetailsContent = ({ 
   description, 
   dueDate, 
-  assignedToName 
+  assignedToName,
+    task
 }: TaskDetailsContentProps) => {
+
   return (
     <CardContent className="space-y-6">
       {description && (
@@ -36,6 +44,17 @@ export const TaskDetailsContent = ({
           </p>
         </div>
       </div>
+        {task &&
+        <Badge variant="outline" className={cn("capitalize",
+            task.status === "todo" ? "bg-gray-100 text-gray-600" :
+            task.status === "in_progress" ? "bg-yellow-100 text-yellow-600" :
+            task.status === "completed" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600",
+        )}>
+            {task.status === "todo" ? "To Do" :
+            task.status === "in_progress" ? "In Progress" :
+            task.status === "completed" ? "Completed" : "Cancelled"}
+        </Badge>
+        }
     </CardContent>
   );
 };

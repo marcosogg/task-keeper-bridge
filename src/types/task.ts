@@ -1,3 +1,4 @@
+// src/types/task.ts
 export interface Task {
   id: string;
   title: string;
@@ -5,7 +6,7 @@ export interface Task {
   status: 'todo' | 'in_progress' | 'completed' | 'cancelled';
   priority: 'low' | 'medium' | 'high';
   due_date?: string | null;
-  assigned_to?: string | null;
+    assigned_to: string[] | null;
   created_by: string;
   family_id: string;
   created_at: string;
@@ -26,3 +27,4 @@ export interface TaskComment {
   createdAt: string;
   updatedAt: string;
 }
+

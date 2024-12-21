@@ -1,19 +1,7 @@
+// src/components/tasks/form/TaskFormActions.tsx
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 
 interface FamilyMember {
@@ -43,70 +31,42 @@ export const TaskFormActions = ({
   onAssigneesChange,
   availableAssignees,
 }: TaskFormActionsProps) => {
-  const [open, setOpen] = useState(false);
+  const assigneeOptions = availableAssignees.map((member) => ({
+    label: member.profiles.full_name || member.profiles.email || "Unknown",
+    value: member.profile_id,
+  }));
+
+  const renderOption = (option: { label: string; value: string }) => {
+    const member = availableAssignees.find((m) => m.profile_id === option.value);
+    if (!member) return option.label;
+
+    return (
+      <div className="flex items-center gap-2">
+        <Avatar className="h-6 w-6">
+          <AvatarImage
+            src={member.profiles.avatar_url || undefined}
+            alt={member.profiles.full_name || ""}
+          />
+          <AvatarFallback>
+            {(member.profiles.full_name || member.profiles.email || "?").charAt(0)}
+          </AvatarFallback>
+        </Avatar>
+        <span>{member.profiles.full_name || member.profiles.email || "Unknown"}</span>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">Assign to</label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-          >
-            {assignees.length > 0
-              ? availableAssignees.find((member) => member.profile_id === assignees[0])
-                  ?.profiles.full_name
-              : "Select member..."}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
-          <Command>
-            <CommandInput placeholder="Search member..." />
-            <CommandEmpty>No member found.</CommandEmpty>
-            <CommandGroup>
-              {availableAssignees.map((member) => (
-                <CommandItem
-                  key={member.profile_id}
-                  value={member.profile_id}
-                  onSelect={(currentValue) => {
-                    onAssigneesChange(
-                      assignees.includes(currentValue)
-                        ? assignees.filter((id) => id !== currentValue)
-                        : [currentValue]
-                    );
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      assignees.includes(member.profile_id)
-                        ? "opacity-100"
-                        : "opacity-0"
-                    )}
-                  />
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage
-                        src={member.profiles.avatar_url || undefined}
-                        alt={member.profiles.full_name || ""}
-                      />
-                      <AvatarFallback>
-                        {member.profiles.full_name?.[0] || "?"}
-                      </AvatarFallback>
-                    </Avatar>
-                    {member.profiles.full_name}
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
-        </PopoverContent>
-      </Popover>
+      <label htmlFor="assignees" className="text-sm font-medium">Assign to</label>
+      <MultiSelect
+        options={assigneeOptions}
+        selected={assignees}
+        onChange={onAssigneesChange}
+        placeholder="Select members..."
+        className="w-full"
+        renderOption={renderOption}
+      />
     </div>
   );
 };

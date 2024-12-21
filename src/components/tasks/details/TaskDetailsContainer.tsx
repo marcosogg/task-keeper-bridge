@@ -1,3 +1,4 @@
+// src/components/tasks/details/TaskDetailsContainer.tsx
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +13,7 @@ import { EditTaskModal } from "../EditTaskModal";
 import { DeleteTaskDialog } from "./DeleteTaskDialog";
 import type { Task } from "@/types/task";
 
-export const TaskDetailsContainer = () => {
+const TaskDetailsContainer = () => {
   const { taskId } = useParams<{ taskId: string }>();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -78,7 +79,7 @@ export const TaskDetailsContainer = () => {
       </MainContent>
     );
   }
-
+  
   return (
     <MainContent>
       <div className="p-6">
@@ -94,6 +95,7 @@ export const TaskDetailsContainer = () => {
             description={task.description}
             dueDate={task.due_date}
             assignedToName={task.assigned_to_profile?.full_name}
+              task={task}
           />
         </Card>
       </div>
@@ -112,3 +114,5 @@ export const TaskDetailsContainer = () => {
     </MainContent>
   );
 };
+
+export default TaskDetailsContainer;

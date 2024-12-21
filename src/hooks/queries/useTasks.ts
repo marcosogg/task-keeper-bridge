@@ -4,11 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Task } from "@/types/task";
 import type { TaskResponse } from "@/integrations/supabase/types/responses";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export const useTasks = () => {
   const { user } = useAuth();
     const queryClient = useQueryClient();
+    const familyIdRef = useRef<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['tasks', user?.id],
@@ -29,6 +30,8 @@ export const useTasks = () => {
       if (!familyMember) {
         return [];
       }
+
+        familyIdRef.current = familyMember.family_id;
 
       const { data, error } = await supabase
         .from('tasks')
@@ -61,46 +64,9 @@ export const useTasks = () => {
       });
     },
     enabled: !!user,
+    refetchOnWindowFocus: true,
+      staleTime: 1000 * 60 * 5 //5 minutes
   });
-
-      useEffect(() => {
-        if (!user) return;
-
-        const getFamilyId = async () => {
-        const { data: familyMember } = await supabase
-            .from('family_members')
-            .select('family_id')
-            .eq('profile_id', user.id)
-            .maybeSingle();
-    
-          return familyMember?.family_id;
-        };
-
-        getFamilyId().then(familyId => {
-            if (!familyId) return;
-           
-          const channel = supabase
-            .channel('schema-db-changes')
-            .on(
-              'postgres_changes',
-              {
-                event: '*',
-                schema: 'public',
-                table: 'tasks',
-                filter: `family_id=eq.${familyId}`
-              },
-              () => {
-                queryClient.invalidateQueries({ queryKey: ['tasks'] });
-              }
-            )
-            .subscribe();
-    
-          return () => {
-            supabase.removeChannel(channel);
-            };
-        });
-      }, [user, queryClient]);
 
   return { data: data || [], isLoading, error };
 };
-
